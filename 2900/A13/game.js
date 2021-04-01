@@ -62,6 +62,11 @@ PS.init = function( system, options ) {
 	PS.borderColor(PS.ALL, PS.ALL, PS.COLOR_BLACK)
 	PS.border (PS.ALL, 3, dividerRow)
 
+	for(let y = 4; y < 20; y++) {
+		for (let x = 0; x < 16; x++) {
+			PS.border(x, y, 0);
+		}
+	}
 	// Install additional initialization code
 	// here as needed
 
@@ -159,7 +164,10 @@ PS.enter = function( x, y, data, options ) {
 	// PS.debug( "PS.enter() @ " + x + ", " + y + "\n" );
 
 	// Add code here for when the mouse cursor/touch enters a bead.
-	PS.border(x, y, 2)
+	if(y <= 3){
+		PS.border(x, y, 2)
+	}
+
 	//PS.debug("Width = " + test.top + " " + test.bottom + "\n"); This shouldn't be needed anymore, but I'm keeping it.
 };
 
@@ -181,7 +189,7 @@ PS.exit = function( x, y, data, options ) {
 	// Add code here for when the mouse cursor/touch exits a bead.
 	if(y === 3){
 		PS.border(x, y, dividerRow);
-	} else {
+	} else if (y < 3){
 		PS.border(x, y, 1);
 	}
 };
