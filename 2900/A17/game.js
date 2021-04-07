@@ -29,6 +29,41 @@ var dividerRow = {
 	right : 1
 };
 
+var leftBound = {
+    top : 0,
+    left : 1,
+    bottom : 0,
+    right : 0
+};
+
+var bottomBound = {
+     top : 0,
+    left : 0,
+    bottom : 1,
+    right : 0
+};
+
+var rightBound = {
+    top : 0,
+    left : 0,
+    bottom : 0,
+    right : 1
+};
+
+var leftCorner = {
+    top : 0,
+    left : 1,
+    bottom : 1,
+    right : 0
+}
+
+var rightCorner = {
+    top : 0,
+    left : 0,
+    bottom : 1,
+    right : 1
+}
+
 var brushColor = PS.COLOR_WHITE;
 
 var brushActive = false;
@@ -65,10 +100,22 @@ PS.init = function( system, options ) {
 	PS.border (PS.ALL, 3, dividerRow)
 
 	for(let y = 4; y < 20; y++) {
-		for (let x = 0; x < 16; x++) {
-			PS.border(x, y, 0);
+	    for (let x = 0; x < 16; x++) {
+		if(x === 0){
+		    PS.border(x, y, leftBound);
+		} else if(y === 19){
+		    PS.border(x, y, bottomBound);
+		} else if(x === 15){
+		    PS.border(x, y, rightBound);
+		} else {
+		    PS.border(x, y, 0);
 		}
+	    }
 	}
+
+    //Fix corners (unfortunately necessary for now)
+    PS.border(0, 19, leftCorner);
+    PS.border(15, 19, rightCorner);
 	// Install additional initialization code
 	// here as needed
 
@@ -127,7 +174,7 @@ PS.touch = function( x, y, data, options ) {
 		PS.statusText("Current Selection: " + brushColor.toString(16));
 		PS.statusColor(brushColor);
 	} else {
-	    PS.fade(x, y, 25);
+	    PS.fade(x, y, 15);
 		PS.color(x, y, brushColor);
 	}
 
@@ -179,7 +226,7 @@ PS.enter = function( x, y, data, options ) {
     //PS.debug("Width = " + test.top + " " + test.bottom + "\n"); This shouldn't be needed anymore, but I'm keeping it.
 
     //Use the active brush
-    if(brushActive){
+    if(brushActive && y > 3){
 	PS.fade(x, y, 25);
 	PS.color(x, y, brushColor);
     }
