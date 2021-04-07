@@ -68,6 +68,19 @@ var brushColor = PS.COLOR_WHITE;
 
 var brushActive = false;
 
+var brushSize = 1
+
+var BOARDWIDTH = 16
+
+function checkCoord(x, y){
+
+    if(x < 0 || x > BOARDWIDTH - 1 || y < 0 || y > BOARDWIDTH + 3){
+	return false;
+    } else 
+	return true;
+    
+}
+
 /*
 PS.init( system, options )
 Called once after engine is initialized but before event-polling begins.
@@ -88,7 +101,7 @@ PS.init = function( system, options ) {
 	// Begin with essential setup
 	// Establish initial grid size
 
-	PS.gridSize( 16, 20 ); // or whatever size you want
+	PS.gridSize( BOARDWIDTH, BOARDWIDTH + 4 ); // or whatever size you want
 	PS.gridColor(0xAEAEAE)
 
 	// Default status text, gets changed when a selection is made.
@@ -99,8 +112,8 @@ PS.init = function( system, options ) {
 	PS.borderColor(PS.ALL, PS.ALL, PS.COLOR_BLACK)
 	PS.border (PS.ALL, 3, dividerRow)
 
-	for(let y = 4; y < 20; y++) {
-	    for (let x = 0; x < 16; x++) {
+	for(let y = 4; y < BOARDWIDTH + 4; y++) {
+	    for (let x = 0; x < BOARDWIDTH; x++) {
 		if(x === 0){
 		    PS.border(x, y, leftBound);
 		} else if(y === 19){
@@ -125,14 +138,16 @@ PS.init = function( system, options ) {
 	var color;
 
 	for(let y = 0; y < 4; y++){
-		for(let x = 0; x < 16; x++){
+		for(let x = 0; x < BOARDWIDTH -1; x++){
 			 r = PS.random(256) -1;
 			 g = PS.random(256) -1;
 			 b = PS.random(256) -1;
 			 color = ((r * 65536) + (g * 256) + b);
 			 PS.color(x, y, color);
 		}
+	    PS.glyph(BOARDWIDTH - 1, y, y + 49);
 	}
+    PS.glyph(BOARDWIDTH - 1, 3, "E");
 
 
 
@@ -169,13 +184,47 @@ PS.touch = function( x, y, data, options ) {
 	// Add code here for mouse clicks/touches
 	// over a bead.
 
-	if(y <= 3){
+	if(y <= 3 && x < BOARDWIDTH - 1){
 		brushColor = PS.color(x, y, PS.CURRENT);
 		PS.statusText("Current Selection: " + brushColor.toString(16));
 		PS.statusColor(brushColor);
+	} else if(y <= 3 && x === BOARDWIDTH - 1){
+	    if(PS.glyph(x, y, PS.CURRENT) == 49){
+		PS.statusText("Brush Size: " + 1);
+		brushSize = 1
+	    } else if(PS.glyph(x, y, PS.CURRENT) == 50){
+		PS.statusText("Brush Size: " + 2);
+		brushSize = 2
+	    } else if(PS.glyph(x, y, PS.CURRENT) == 51){
+		PS.statusText("Brush Size: " + 3);
+		brushSize = 3
+	    } else if(PS.glyph(x, y, PS.CURRENT) == 69){
+		PS.statusText("Erase Mode.");
+		brushColor = PS.COLOR_WHITE
+	    }
 	} else {
-	    PS.fade(x, y, 15);
+	    if(brushSize == 3){
+		if(checkCoord(x - 1, y) && checkCoord(x + 1, y)){
+		    PS.fade(x-1, y, 15);
+		    PS.color(x-1, y, brushColor);
+		    PS.fade(x+1, y, 15);
+		    PS.color(x+1, y, brushColor);
+		}
+		PS.fade(x, y, 15);
 		PS.color(x, y, brushColor);
+		
+	    } else if(brushSize ==  2){
+		if(checkCoord(x - 1, y)){
+		    PS.fade(x-1, y, 15);
+		    PS.color(x-1, y, brushColor);
+		}
+		PS.fade(x, y, 15);
+		PS.color(x, y, brushColor);
+
+	    }   else if(brushSize == 1){
+		PS.fade(x, y, 15);
+		PS.color(x, y, brushColor);
+	    }
 	}
 
     // Activate the brush to use while holding.
@@ -219,17 +268,37 @@ PS.enter = function( x, y, data, options ) {
 	// PS.debug( "PS.enter() @ " + x + ", " + y + "\n" );
 
 	// Add code here for when the mouse cursor/touch enters a bead.
-	if(y <= 3){
+	if (y <= 3) {
 		PS.border(x, y, 2)
 	}
 
-    //PS.debug("Width = " + test.top + " " + test.bottom + "\n"); This shouldn't be needed anymore, but I'm keeping it.
+	//PS.debug("Width = " + test.top + " " + test.bottom + "\n"); This shouldn't be needed anymore, but I'm keeping it.
 
-    //Use the active brush
-    if(brushActive && y > 3){
-	PS.fade(x, y, 25);
-	PS.color(x, y, brushColor);
-    }
+	//Use the active brush
+	if (brushActive && y > 3) {
+		if (brushSize == 3) {
+			if (checkCoord(x - 1, y) && checkCoord(x + 1, y)) {
+				PS.fade(x - 1, y, 15);
+				PS.color(x - 1, y, brushColor);
+				PS.fade(x + 1, y, 15);
+				PS.color(x + 1, y, brushColor);
+			}
+			PS.fade(x, y, 15);
+			PS.color(x, y, brushColor);
+
+		} else if (brushSize == 2) {
+			if (checkCoord(x - 1, y)) {
+				PS.fade(x - 1, y, 15);
+				PS.color(x - 1, y, brushColor);
+			}
+			PS.fade(x, y, 15);
+			PS.color(x, y, brushColor);
+
+		} else if (brushSize == 1) {
+			PS.fade(x, y, 15);
+			PS.color(x, y, brushColor);
+		}
+	}
 };
 
 /*
@@ -342,4 +411,5 @@ PS.shutdown = function( options ) {
 
 	// Add code here to tidy up when Perlenspiel is about to close.
 };
+
 
