@@ -31,6 +31,8 @@ var dividerRow = {
 
 var brushColor = PS.COLOR_WHITE;
 
+var brushActive = false;
+
 /*
 PS.init( system, options )
 Called once after engine is initialized but before event-polling begins.
@@ -98,7 +100,7 @@ PS.init = function( system, options ) {
 		}
 		PS.dbEvent( TEAM, "startup", user );
 		PS.dbSend( TEAM, PS.CURRENT, { discard : true } );
-	}, { active : true } );
+	}, { active : false } );
 };
 
 /*
@@ -125,8 +127,12 @@ PS.touch = function( x, y, data, options ) {
 		PS.statusText("Current Selection: " + brushColor.toString(16));
 		PS.statusColor(brushColor);
 	} else {
+	    PS.fade(x, y, 25);
 		PS.color(x, y, brushColor);
 	}
+
+    // Activate the brush to use while holding.
+    brushActive = true;
 
 };
 
@@ -145,7 +151,9 @@ PS.release = function( x, y, data, options ) {
 
 	// PS.debug( "PS.release() @ " + x + ", " + y + "\n" );
 
-	// Add code here for when the mouse button/touch is released over a bead.
+    // Add code here for when the mouse button/touch is released over a bead.
+    //Turns off the brush
+    brushActive = false;
 };
 
 /*
@@ -168,7 +176,13 @@ PS.enter = function( x, y, data, options ) {
 		PS.border(x, y, 2)
 	}
 
-	//PS.debug("Width = " + test.top + " " + test.bottom + "\n"); This shouldn't be needed anymore, but I'm keeping it.
+    //PS.debug("Width = " + test.top + " " + test.bottom + "\n"); This shouldn't be needed anymore, but I'm keeping it.
+
+    //Use the active brush
+    if(brushActive){
+	PS.fade(x, y, 25);
+	PS.color(x, y, brushColor);
+    }
 };
 
 /*
