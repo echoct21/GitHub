@@ -53,7 +53,7 @@ var G = ( function () {
 	var searcherY;
 	var currentMap = 0;
 
-	const COLOR_WALL = 0x474742;
+	//const COLOR_WALL = 0x474742;
 	const COLOR_WARP = 0xa236c9
 	const COLOR_END = 0xf5d222
 	const MAP_SIZE = 15;
@@ -133,19 +133,44 @@ var G = ( function () {
 		[w, B, w, w, w, w, B, B, B, B, B, B, B, B, Y,]
 	];
 
+	var map5 = [
+		[B, w, w, w, w, w, w, w, w, w, B, w, w, w, w,],
+		[B, w, w, w, w, w, w, w, w, B, B, B, B, w, w,],
+		[B, w, w, w, w, T, B, B, B, B, w, w, B, w, w,],
+		[B, B, B, w, w, w, w, w, w, B, B, B, B, w, w,],
+		[B, w, B, w, w, w, w, w, w, B, w, w, w, w, B,],
+		[w, w, B, w, w, B, B, B, B, B, w, w, w, w, B,],
+		[w, T, B, w, w, w, B, w, w, w, w, w, w, w, B,],
+		[w, B, w, w, B, B, B, w, w, B, B, B, B, w, B,],
+		[w, B, w, w, B, w, w, w, w, B, w, w, B, w, B,],
+		[w, Y, w, w, B, w, w, w, B, B, w, w, B, w, B,],
+		[w, B, w, w, B, w, w, w, B, w, w, w, B, B, B,],
+		[w, B, w, w, B, B, w, w, B, w, w, w, w, w, w,],
+		[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B,],
+		[w, w, w, B, w, w, w, w, B, w, w, w, w, w, w,],
+		[w, w, w, B, w, w, w, w, B, w, w, w, B, w, w,]
+	]
+
 	var mapArray = [
-		map1, map2, map3, map4
+		map1, map2, map3, map4, map5
 	];
 
 	var collectedLetters = [];
 
 	var startArray = ['S', 'T', 'A', 'R', 'T'];
 
-	var wordArray = ['S', 'T', 'O', 'P'];
+	var wordArray = ["Stop", "Frog", "Horse", "Pig", "House", "Ball", "Tree"];
+
+	var chosenWord;
+
+	var chosenWordArray;
 
 	var finalArray = [];
 
 	var activeGlyph = 0;
+
+	var collected = "collected";
+	var input = "input";
 
 
 	var startScreen = function() {
@@ -163,14 +188,16 @@ var G = ( function () {
 			PS.border(x, 7, 1);
 			PS.glyph(x, 7, startArray[x - 5]);
 		}
+		chosenWord = wordArray[(PS.random(wordArray.length - 1)) - 1];
+		chosenWordArray = Array.from(chosenWord);
 		//PS.glyph(0,14, 42);
 	};
 
 	var drawMap = function(map){
 		var row, col, data;
 		//PS.debug("Map number " + map + "\n");
-
-		var m = mapArray[map];
+		//TODO make this randomized
+		//var m = mapArray[map];
 		//PS.debug(m);
 		for (row = 0; row <  MAP_SIZE; row += 1) {
 			for (col = 0; col < MAP_SIZE; col += 1) {
@@ -178,10 +205,11 @@ var G = ( function () {
 				//PS.debug("map[" + row + "," + col + "]=" + data + "\n");
 
 				if (data === 0) {
-					PS.color(col, row, COLOR_WALL);
+					var color = (( PS.random( 32 ) - 1 ) + 128);
+					PS.color(col, row, color, color, color) ;
 				} else if(data === 2){
 					PS.color(col, row, COLOR_END);
-					PS.glyph(col, row, wordArray[currentMap]);
+					PS.glyph(col, row, chosenWordArray[currentMap]);
 				} else if(data === 3){
 					PS.color(col, row, COLOR_WARP);
 				}
@@ -189,6 +217,8 @@ var G = ( function () {
 		}
 		PS.gridPlane(1);
 	};
+
+
 
 	var clearScreen = function() {
 		PS.gridPlane(0);
@@ -224,11 +254,27 @@ var G = ( function () {
 		for(let x = 1; x < collectedLetters.length + 1; x++){
 			PS.glyph(x, 13, collectedLetters[x - 1])
 		}
+		for(let x = 1; x < Array.from(input).length + 1; x++){
+			PS.glyph(x, 3, Array.from(input)[x - 1]);
+		}
+		for(let x = 1; x < Array.from(collected).length + 1; x++){
+			PS.glyph(x, 12, Array.from(collected)[x - 1]);
+		}
 
 
 
 
 	};
+
+	//Shuffle function taken from : https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+	var shuffleArray = function(array) {
+		for (var i = array.length - 1; i > 0; i--) {
+			var j = Math.floor(Math.random() * (i + 1));
+			var temp = array[i];
+			array[i] = array[j];
+			array[j] = temp;
+		}
+	}
 
 	var exports = {
 
@@ -254,6 +300,8 @@ var G = ( function () {
 
 			startScreen();
 
+			shuffleArray(mapArray);
+
 			// Change this TEAM constant to your team name,
 			// using ONLY alphabetic characters (a-z).
 			// No numbers, spaces, punctuation or special characters!
@@ -271,7 +319,7 @@ var G = ( function () {
 				}
 				PS.dbEvent(TEAM, "startup", user);
 				PS.dbSend(TEAM, PS.CURRENT, {discard: true});
-			}, {active: true});
+			}, {active: false});
 			// Change the false in the final line above to true
 			// before deploying the code to your Web site.
 		},
@@ -283,7 +331,6 @@ var G = ( function () {
 			PS.color(0,0, PS.COLOR_RED);
 			searcherX = 0;
 			searcherY = 0;
-			PS.color(0,0,PS.COLOR_RED);
 
 		},
 
@@ -309,7 +356,7 @@ var G = ( function () {
 				return;
 			}
 
-			if (PS.color(nx, ny) === COLOR_WALL) {
+			if ((PS.color(nx, ny,) != PS.COLOR_WHITE) && (PS.color(nx, ny) != COLOR_WARP) && (PS.color(nx, ny) != COLOR_END)) {
 				return;
 			}
 
@@ -335,8 +382,8 @@ var G = ( function () {
 			PS.gridPlane(0);
 			//PS.debug("Active grid plane 0. End search \n");
 			if (PS.color(searcherX, searcherY, PS.CURRENT) == COLOR_END) {
-				collectedLetters.push(wordArray[currentMap]);
-				if(collectedLetters.length === wordArray.length){
+				collectedLetters.push(chosenWordArray[currentMap]);
+				if(collectedLetters.length === chosenWordArray.length){
 					endScreen();
 				} else {
 					currentMap++;
@@ -388,34 +435,36 @@ var G = ( function () {
 				}
 			}
 
-			if(endActive){
-				if((x < 14 && x > 0) && y === 13){
-					activeGlyph = PS.glyph(x,y,PS.CURRENT);
+			if(endActive) {
+				if ((x < 14 && x > 0) && y === 13) {
+					activeGlyph = PS.glyph(x, y, PS.CURRENT);
 					PS.statusText("Active Glyph is " + String.fromCharCode(activeGlyph));
-				} else if((x < 14 && x > 0) && y === 2){
+				} else if ((x < 14 && x > 0) && y === 2) {
 					PS.glyph(x, y, activeGlyph);
 					PS.statusText("Glyph Set!")
-					finalArray.push(String.fromCharCode(activeGlyph));
+					finalArray.splice(x - 1, 1, String.fromCharCode(activeGlyph));
 					//PS.debug(wordArray + "\n");
 					//PS.debug(finalArray + "\n");
 					//Fix this, because it doesn't work if they do it out of order.
-					if (finalArray.length === wordArray.length) {
-						for (let i = 0; i < finalArray.length; i++) {
-							if (finalArray[i] != wordArray[i]) {
-								PS.statusText("Not correct, sorry!");
-							} else {
-								PS.statusText("You win!");
-								endActive = false;
-							}
+					PS.debug(finalArray);
+					var win = true;
+					for (let i = 0; i < chosenWordArray.length; i++) {
+						if (chosenWordArray[i] != finalArray[i]) {
+							win = false;
+							break;
 						}
+					}
+					if (win === true) {
+						PS.statusText("You win!");
 					}
 				}
 			}
-			if(PS.glyph(x,y) == 42){
-				collectedLetters.push('S', 'T', 'O', 'P');
-				endScreen();
-				startActive = false;
-			}
+				if (PS.glyph(x, y) == 42) {
+					Array.prototype.push.apply(collectedLetters, chosenWordArray);
+					//collectedLetters.push.apply(chosenWordArray);
+					endScreen();
+					startActive = false;
+				}
 		},
 	};
 
