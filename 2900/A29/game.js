@@ -193,7 +193,7 @@ var G = ( function () {
 		}
 		chosenWord = wordArray[(PS.random(wordArray.length - 1)) - 1];
 		chosenWordArray = Array.from(chosenWord);
-		orderedChosenWord = chosenWordArray;
+		orderedChosenWord = Array.from(chosenWord);
 		shuffleArray(chosenWordArray);
 		PS.glyph(0,14, 42);
 	};
@@ -307,6 +307,8 @@ var G = ( function () {
 
 			PS.audioLoad("perc_triangle")
 			PS.audioLoad("fx_powerup4")
+
+			PS.fade(PS.ALL, PS.ALL, 20);
 
 			// Change this TEAM constant to your team name,
 			// using ONLY alphabetic characters (a-z).
@@ -444,10 +446,10 @@ var G = ( function () {
 					G.start(currentMap);
 				}
 			}
-
+// Win checking that doesn't work
 			if(endActive) {
 				if ((x < 14 && x > 0) && y === 13) {
-					activeGlyph = PS.glyph(x, y, PS.CURRENT);
+					activeGlyph = PS.glyph(x, y);
 					PS.statusText("Active Glyph is " + String.fromCharCode(activeGlyph));
 				} else if ((x < 14 && x > 0) && y === 2) {
 					PS.glyph(x, y, activeGlyph);
@@ -456,7 +458,8 @@ var G = ( function () {
 					//PS.debug(wordArray + "\n");
 					//PS.debug(finalArray + "\n");
 					//Fix this, because it doesn't work if they do it out of order.
-					//PS.debug(finalArray);
+					PS.debug(finalArray);
+					PS.debug(orderedChosenWord);
 					var win = true;
 					for (let i = 0; i < orderedChosenWord.length; i++) {
 						if (orderedChosenWord[i] != finalArray[i]) {
@@ -476,6 +479,45 @@ var G = ( function () {
 					startActive = false;
 				}
 		},
+
+		keyDown : function(key, shift, ctrl, options){
+			if(endActive){
+				return;
+			} else if(startActive){
+				return;
+			} else {
+				switch (key) {
+					case PS.KEY_ARROW_UP:
+					case 119:
+					case 87: {
+						// Code to move things UP
+						G.move(0, -1);
+						break;
+					}
+					case PS.KEY_ARROW_DOWN:
+					case 115:
+					case 83: {
+						// Code to move things DOWN
+						G.move(0, 1);
+						break;
+					}
+					case PS.KEY_ARROW_LEFT:
+					case 97:
+					case 65: {
+						// Code to move things LEFT
+						G.move(-1, 0);
+						break;
+					}
+					case PS.KEY_ARROW_RIGHT:
+					case 100:
+					case 68: {
+						// Code to move things RIGHT
+						G.move(1, 0);
+						break;
+					}
+				}
+			}
+		}
 	};
 
 	// Return the 'exports' object as the value
@@ -636,7 +678,7 @@ This function doesn't have to do anything. Any value returned is ignored.
 [options : Object] = A JavaScript object with optional data properties; see API documentation for details.
 */
 
-PS.keyDown = function( key, shift, ctrl, options ) {
+PS.keyDown = G.keyDown; /*function( key, shift, ctrl, options ) {
 	// Uncomment the following code line to inspect first three parameters:
 
 	// PS.debug( "PS.keyDown(): key=" + key + ", shift=" + shift + ", ctrl=" + ctrl + "\n" );
@@ -673,7 +715,7 @@ PS.keyDown = function( key, shift, ctrl, options ) {
 			break;
 		}
 	}
-};
+}; */
 
 /*
 PS.keyUp ( key, shift, ctrl, options )
