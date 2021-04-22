@@ -195,7 +195,7 @@ var G = ( function () {
 		chosenWordArray = Array.from(chosenWord);
 		orderedChosenWord = Array.from(chosenWord);
 		shuffleArray(chosenWordArray);
-		PS.glyph(0,14, 42);
+		//PS.glyph(0,14, 42);
 	};
 
 	var drawMap = function(map){
@@ -458,8 +458,8 @@ var G = ( function () {
 					//PS.debug(wordArray + "\n");
 					//PS.debug(finalArray + "\n");
 					//Fix this, because it doesn't work if they do it out of order.
-					PS.debug(finalArray);
-					PS.debug(orderedChosenWord);
+					//PS.debug(finalArray);
+					//PS.debug(orderedChosenWord);
 					var win = true;
 					for (let i = 0; i < orderedChosenWord.length; i++) {
 						if (orderedChosenWord[i] != finalArray[i]) {
