@@ -129,7 +129,6 @@ var G = (function () {
 	let currentMap = 0;
 
 	let enemies = [];
-	let player;
 
 	let playerX;
 	let playerY;
@@ -165,12 +164,13 @@ var G = (function () {
 					var color = (( PS.random( 16 ) - 1 ) + 128);
 					PS.color(col, row, color, color, color);
 					PS.data(col, row, "enemy");
+					enemies.push({x: col, y: row});
 				}
 			}
 		}
 		PS.gridPlane(1);
 		placeChars();
-		//toggleVision();
+		toggleVision();
 	}
 
 	/**
@@ -198,23 +198,13 @@ var G = (function () {
 	 */
 	var placeChars = function(){
 		var row, col, data;
-		for(let i = 0; i < enemies.length; i++){
-			PS.spriteDelete(enemies[i]);
-		}
 		for (row = 0; row <  MAP_SIZE; row++) {
 			for (col = 0; col < MAP_SIZE; col++) {
 				data = PS.data(col, row);
 				if(data == "enemy"){
 					//PS.debug(data)
-					let enemy = PS.spriteSolid(1, 1);
-					PS.spriteMove(enemy, col, row);
-					PS.spritePlane(enemy, 1);
-					//PS.color(col, row, PS.COLOR_BLACK);
-					//PS.alpha(col, row, PS.ALPHA_OPAQUE);
-					//PS.data(col, row, "enemy");
-					PS.debug(enemies);
-					enemies.push(enemy);
-					PS.data(col, row, PS.DEFAULT);
+					PS.color(col, row, PS.COLOR_BLACK);
+					PS.alpha(col, row, PS.ALPHA_OPAQUE);
 				}
 			}
 		}
@@ -222,13 +212,9 @@ var G = (function () {
 			if(PS.data(0, row) == "enter"){
 				PS.color(0, row, 0xEEEEEE);
 				//PS.data(0, row, "player");
-				//PS.alpha(0, row, PS.ALPHA_OPAQUE);
-				player = PS.spriteSolid(1, 1);
-				PS.spriteMove(player, 0, row);
-				PS.spriteSolidColor(player, PS.COLOR_WHITE);
-				PS.spritePlane(player, 1);
-				//playerX = 0;
-				//playerY = row;
+				PS.alpha(0, row, PS.ALPHA_OPAQUE);
+				playerX = 0;
+				playerY = row;
 				//PS.debug("player" + playerX + " " + playerY + "\n")
 				break;
 			}
@@ -239,10 +225,6 @@ var G = (function () {
 	 * Creates a win screen where you can shoot fireworks by pressing space.
 	 */
 	var endScreen = function(){
-		PS.spriteDelete(player);
-		for(let i = 0; i < enemies.length; i++){
-			PS.spriteDelete(enemies[i]);
-		}
 		clearScreen();
 	}
 
@@ -253,9 +235,8 @@ var G = (function () {
 	 */
 	var move = function(x, y){
 		let nx, ny;
-		let location = PS.spriteMove(player);
-		nx = location.x + x;
-		ny = location.y + y;
+		nx = playerX + x;
+		ny = playerY + y;
 
 		/*PS.debug("chosen" + nx + " " + ny + "\n")
 		PS.debug("player" + playerX + " " + playerY + "\n")
@@ -283,17 +264,16 @@ var G = (function () {
 			return;
 		}
 		//Actually move
-		//PS.alpha(playerX, playerY, 0);
-		//PS.data(playerX, playerY, PS.DEFAULT);
+		PS.alpha(playerX, playerY, 0);
+		PS.data(playerX, playerY, PS.DEFAULT);
 		//PS.data(nx, ny, "player");
-		//PS.color(nx, ny, 0xEEEEEE);
-		//PS.alpha(nx, ny, PS.ALPHA_OPAQUE);
-		PS.spriteMove(player, nx, ny);
-		//playerX = nx;
-		//playerY = ny;
+		PS.color(nx, ny, 0xEEEEEE);
+		PS.alpha(nx, ny, PS.ALPHA_OPAQUE);
+		playerX = nx;
+		playerY = ny;
 
 		//Check if we just moved onto the end, and advance the level
-		if(PS.data(location.x, location.y) == "exit"){
+		if(PS.data(playerX, playerY) == "exit"){
 			currentMap++
 			PS.timerStop(timer);
 			if(currentMap === mapArray.length){
@@ -303,12 +283,10 @@ var G = (function () {
 			}
 		}
 
-		//Make a path to the player
 		for(let i = 0; i < enemies.length; i++){
-			let locationE = PS.spriteMove(enemies[i]);
 			var line;
 
-			line = PS.line(locationE.x, locationE.y, location.x, location.y);
+			line = PS.line(enemies[i].x, enemies[i].y, playerX, playerY);
 
 			if ( line.length > 0 ) {
 				enemies[i].path = line;
@@ -360,7 +338,7 @@ var G = (function () {
 	var triggerMovement = function() {
 		for (let i = 0; i < enemies.length; i++) {
 			//PS.debug(enemies[i].x + ", " + enemies[i].y + "\n");
-			let location = PS.spriteMove(enemies[i]);
+
 			if (enemies[i].path) { // path ready (not null)?
 				// Get next point on path
 				let p = enemies[i].path[enemies[i].step];
@@ -368,7 +346,7 @@ var G = (function () {
 				let ny = p[1]; // next y-pos
 				// If actor already at next pos,
 				// path is exhausted, so nuke it
-				if ((location.x === nx) && (location.y === ny)){
+				if ((enemies[i].x === nx) && (enemies[i].y === ny)){
 					enemies[i].path = null;
 					return;
 				}
@@ -391,14 +369,13 @@ var G = (function () {
 				//Everything else is on the upper plane.
 				PS.gridPlane(1);
 
-				PS.spriteMove(enemies[i], nx, ny);
-				//PS.data(location.x, enemies[i].y, PS.DEFAULT);
-				//PS.alpha(location.x, enemies[i].y, 0);
-				//PS.color(nx, ny, PS.COLOR_BLACK);
-				//PS.alpha(nx, ny, PS.ALPHA_OPAQUE);
+				PS.data(enemies[i].x, enemies[i].y, PS.DEFAULT);
+				PS.alpha(enemies[i].x, enemies[i].y, 0);
+				PS.color(nx, ny, PS.COLOR_BLACK);
+				PS.alpha(nx, ny, PS.ALPHA_OPAQUE);
 
-				//enemies[i].x = nx; // update xpos
-				//enemies[i].y = ny; // and ypos
+				enemies[i].x = nx; // update xpos
+				enemies[i].y = ny; // and ypos
 
 				enemies[i].step += 1; // point to next step
 
