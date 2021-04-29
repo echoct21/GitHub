@@ -170,7 +170,7 @@ var G = (function () {
 		}
 		PS.gridPlane(1);
 		placeChars();
-		//toggleVision();
+		toggleVision();
 	}
 
 	/**
@@ -212,8 +212,9 @@ var G = (function () {
 					//PS.color(col, row, PS.COLOR_BLACK);
 					//PS.alpha(col, row, PS.ALPHA_OPAQUE);
 					//PS.data(col, row, "enemy");
-					PS.debug(enemies);
-					enemies.push(enemy);
+					//PS.debug(enemies);
+					var enemyO = {e: enemy, line : null , step : null};
+					enemies.push(enemyO);
 					PS.data(col, row, PS.DEFAULT);
 				}
 			}
@@ -305,13 +306,13 @@ var G = (function () {
 
 		//Make a path to the player
 		for(let i = 0; i < enemies.length; i++){
-			let locationE = PS.spriteMove(enemies[i]);
+			let locationE = PS.spriteMove(enemies[i].e);
 			var line;
 
 			line = PS.line(locationE.x, locationE.y, location.x, location.y);
 
 			if ( line.length > 0 ) {
-				enemies[i].path = line;
+				enemies[i].line = line;
 				enemies[i].step = 0; // start at beginning
 			}
 		}
@@ -360,16 +361,16 @@ var G = (function () {
 	var triggerMovement = function() {
 		for (let i = 0; i < enemies.length; i++) {
 			//PS.debug(enemies[i].x + ", " + enemies[i].y + "\n");
-			let location = PS.spriteMove(enemies[i]);
-			if (enemies[i].path) { // path ready (not null)?
+			let location = PS.spriteMove(enemies[i].e);
+			if (enemies[i].line) { // path ready (not null)?
 				// Get next point on path
-				let p = enemies[i].path[enemies[i].step];
+				let p = enemies[i].line[enemies[i].step];
 				let nx = p[0]; // next x-pos
 				let ny = p[1]; // next y-pos
 				// If actor already at next pos,
 				// path is exhausted, so nuke it
 				if ((location.x === nx) && (location.y === ny)){
-					enemies[i].path = null;
+					enemies[i].line = null;
 					return;
 				}
 
@@ -391,7 +392,7 @@ var G = (function () {
 				//Everything else is on the upper plane.
 				PS.gridPlane(1);
 
-				PS.spriteMove(enemies[i], nx, ny);
+				PS.spriteMove(enemies[i].e, nx, ny);
 				//PS.data(location.x, enemies[i].y, PS.DEFAULT);
 				//PS.alpha(location.x, enemies[i].y, 0);
 				//PS.color(nx, ny, PS.COLOR_BLACK);
@@ -400,12 +401,12 @@ var G = (function () {
 				//enemies[i].x = nx; // update xpos
 				//enemies[i].y = ny; // and ypos
 
-				enemies[i].step += 1; // point to next step
+				enemies[i + 2] += 1; // point to next step
 
 				// If no more steps, nuke path
 
-				if (enemies[i].step >= enemies[i].path.length - 1) {
-					enemies[i].path = null;
+				if (enemies[i].step >= enemies[i].line.length - 1) {
+					enemies[i].line = null;
 				}
 			}
 		}
