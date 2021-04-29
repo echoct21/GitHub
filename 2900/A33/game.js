@@ -177,7 +177,6 @@ var G = (function () {
 	 * Clears the screen to prepare for the next thing (screen or map)
 	 */
 	var clearScreen = function() {
-		enemies = [];
 		PS.gridPlane(0);
 		for(let x = 0; x < MAP_SIZE; x++){
 			for(let y = 0; y < MAP_SIZE; y++){
@@ -199,28 +198,31 @@ var G = (function () {
 	var placeChars = function(){
 		var row, col, data;
 		for(let i = 0; i < enemies.length; i++){
-			PS.spriteDelete(enemies[i]);
+			PS.spriteDelete(enemies[i].e);
+		}
+		for(let i = 0; i < enemies.length; i++){
+			PS.spriteDelete(enemies[i].e);
 		}
 		for (row = 0; row <  MAP_SIZE; row++) {
 			for (col = 0; col < MAP_SIZE; col++) {
 				data = PS.data(col, row);
-				if(data == "enemy"){
+				if(data === "enemy"){
 					//PS.debug(data)
-					let enemy = PS.spriteSolid(1, 1);
+					var enemy = PS.spriteSolid(1, 1);
 					PS.spriteMove(enemy, col, row);
 					PS.spritePlane(enemy, 1);
 					//PS.color(col, row, PS.COLOR_BLACK);
 					//PS.alpha(col, row, PS.ALPHA_OPAQUE);
 					//PS.data(col, row, "enemy");
 					//PS.debug(enemies);
-					var enemyO = {e: enemy, line : null , step : null};
+					var enemyO = {e : enemy, line : null , step : null};
 					enemies.push(enemyO);
 					PS.data(col, row, PS.DEFAULT);
 				}
 			}
 		}
 		for (row = 0; row < MAP_SIZE; row++) {
-			if(PS.data(0, row) == "enter"){
+			if(PS.data(0, row) === "enter"){
 				PS.color(0, row, 0xEEEEEE);
 				//PS.data(0, row, "player");
 				//PS.alpha(0, row, PS.ALPHA_OPAQUE);
@@ -228,6 +230,7 @@ var G = (function () {
 				PS.spriteMove(player, 0, row);
 				PS.spriteSolidColor(player, PS.COLOR_WHITE);
 				PS.spritePlane(player, 1);
+				PS.spriteCollide(player, damage);
 				//playerX = 0;
 				//playerY = row;
 				//PS.debug("player" + playerX + " " + playerY + "\n")
@@ -240,9 +243,10 @@ var G = (function () {
 	 * Creates a win screen where you can shoot fireworks by pressing space.
 	 */
 	var endScreen = function(){
+		PS.debug("End");
 		PS.spriteDelete(player);
 		for(let i = 0; i < enemies.length; i++){
-			PS.spriteDelete(enemies[i]);
+			PS.spriteDelete(enemies[i].e);
 		}
 		clearScreen();
 	}
@@ -278,11 +282,6 @@ var G = (function () {
 		}
 		//Everything else is on the upper plane.
 		PS.gridPlane(1);
-		//Check enemy contact
-		if(PS.data(nx,ny) == "enemy"){
-			incrementLives(-1);
-			return;
-		}
 		//Actually move
 		//PS.alpha(playerX, playerY, 0);
 		//PS.data(playerX, playerY, PS.DEFAULT);
@@ -292,11 +291,11 @@ var G = (function () {
 		PS.spriteMove(player, nx, ny);
 		//playerX = nx;
 		//playerY = ny;
-
+		location = PS.spriteMove(player);
 		//Check if we just moved onto the end, and advance the level
-		if(PS.data(location.x, location.y) == "exit"){
+		if(PS.data(location.x, location.y) === "exit"){
 			currentMap++
-			PS.timerStop(timer);
+			//PS.timerStop(timer);
 			if(currentMap === mapArray.length){
 				endScreen();
 			} else {
@@ -304,7 +303,8 @@ var G = (function () {
 			}
 		}
 
-		//Make a path to the player
+		//TODO uncomment and fix this? Might not need fixing
+		/*Make a path to the player
 		for(let i = 0; i < enemies.length; i++){
 			let locationE = PS.spriteMove(enemies[i].e);
 			var line;
@@ -315,7 +315,7 @@ var G = (function () {
 				enemies[i].line = line;
 				enemies[i].step = 0; // start at beginning
 			}
-		}
+		} */
 	}
 
 	/**
@@ -328,6 +328,8 @@ var G = (function () {
 		for(let i = 0; i < lives; i++){
 			lifeDisplay.push('❤️');
 		}
+		PS.debug("Lives changed by" + value + "\n");
+		PS.debug(lifeDisplay + "\n");
 		PS.statusText(lifeDisplay);
 		if(lives === 0){
 			loseScreen();
@@ -338,6 +340,7 @@ var G = (function () {
 	 * Displays the lose screen
 	 */
 	var loseScreen = function(){
+		PS.debug("Lose");
 		clearScreen();
 		PS.color(PS.ALL, PS.ALL, PS.COLOR_BLACK);
 		PS.statusText("Game Over!")
@@ -351,7 +354,7 @@ var G = (function () {
 		//This does nothing at the moment because the vision system isn't implemented.
 		//However it is here because it will be necessary eventually and adding it now makes it easier.
 		//TODO make this multiple timers for each enemy
-		timer = PS.timerStart(50, triggerMovement);
+		//timer = PS.timerStart(50, triggerMovement);
 
 	}
 
@@ -416,14 +419,23 @@ var G = (function () {
 	 * Eliminates any enemies surrounding the player (doesn't work)
 	 */
 	var eliminate = function(){
-		for(let y = playerY - 2; y < playerY + 3; y++){
-			for(let x = playerX - 2; x < playerX + 3; x++){
-				if(PS.data(x, y) == "enemy"){
-					PS.alpha(x, y, 0);
-					PS.data(x, y, PS.DEFAULT);
+		let location = PS.spriteMove(player);
+		for(let y = location.y - 2; y <= location.y + 2; y++){
+			for(let x = location.x - 2; x <= location.x + 2; x++){
+				for(let i = 0; i < enemies.length; i++){
+					if(PS.spriteMove(enemies[i].e).x === x && PS.spriteMove(enemies[i].e).y === y){
+						PS.spriteDelete(enemies[i].e);
+						enemies.splice(i, 1);
+						//PS.debug("" + enemies);
+					}
 				}
 			}
 		}
+	}
+
+	var damage = function(s1, p1, s2, p2, type){
+		PS.debug("Called increment from collision");
+		incrementLives(-1);
 	}
 
 	// BREAK BETWEEN FUNCTIONS AND EXPORTS
@@ -440,6 +452,7 @@ var G = (function () {
 
 			PS.gridSize( MAP_SIZE, MAP_SIZE );
 
+			PS.debug("called increment from init");
 			incrementLives(0);
 
 			PS.gridColor(0x242424);
