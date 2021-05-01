@@ -138,7 +138,7 @@ var G = (function () {
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
 	]
 	const mapArray = [ROOM1, ROOM2, ROOM3, ROOM4];
-	let currentMap = 3;
+	let currentMap = 0;
 
 	// Create a pool of sprite objects that can be re-used over and over again
 	const MAX_ENEMIES = 20; // increase or decrease as appropriate
