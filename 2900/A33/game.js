@@ -46,14 +46,26 @@ If you don't use JSHint (or are using it with a configuration file), you can saf
 var G = (function () {
 
 	const MAP_SIZE = 16;
+	const PLANE_ENEMY = 1;
+	const PLANE_ACTOR = 2;
+
+	const COLOR_ACTOR = PS.COLOR_WHITE;
+	const COLOR_ENEMY = PS.COLOR_BLACK;
+
 	let timer;
 
-	const w = 0; //wall
-	const f = 1; //floor
-	const x = 2; //exit
-	const n = 3; //enter
-	const e = 4; //enemy
-	const room1 = [
+	const MAP_WALL = 0;
+	const MAP_FLOOR = 1;
+	const MAP_EXIT = 2;
+	const MAP_ENTER = 3;
+	const MAP_ENEMY = 4;
+
+	const w = MAP_WALL;
+	const f = MAP_FLOOR;
+	const x = MAP_EXIT;
+	const n = MAP_ENTER;
+	const e = MAP_ENEMY;
+	const ROOM1 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
 		[w, f, f, e, f, f, f, f, f, f, f, f, e, f, f, w],
@@ -71,7 +83,7 @@ var G = (function () {
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
 	]
-	const room2 = [
+	const ROOM2 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, x],
@@ -89,7 +101,7 @@ var G = (function () {
 		[w, f, f, w, f, f, f, f, f, f, f, f, f, f, f, w],
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
 	]
-	const room3 = [
+	const ROOM3 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
 		[w, f, f, f, f, f, f, w, f, f, f, f, f, f, f, w],
 		[w, f, f, w, f, f, f, f, f, f, w, f, f, f, f, w],
@@ -107,7 +119,7 @@ var G = (function () {
 		[w, f, f, f, f, f, w, f, f, f, f, f, f, f, f, w],
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
 	]
-	const room4 = [
+	const ROOM4 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
 		[n, f, f, w, f, f, f, f, f, f, f, f, f, f, f, w],
 		[n, f, f, w, f, f, f, f, f, f, f, f, f, f, f, w],
@@ -125,84 +137,115 @@ var G = (function () {
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
 	]
-	let mapArray = [room1, room2, room3, room4];
-	let currentMap = 0;
+	const mapArray = [ROOM1, ROOM2, ROOM3, ROOM4];
+	let currentMap = 3;
 
-	let enemies = [];
+	// Create a pool of sprite objects that can be re-used over and over again
+	const MAX_ENEMIES = 20; // increase or decrease as appropriate
+	const enemies = [];
+	let e_count = 0; // number of active enemies
+
 	let player;
-
-	let playerX;
-	let playerY;
-
+	let actor_x;
+	let actor_y;
 	let lives = 3;
 
 	/**
 	 * Draws the map on the board, clearing the screen before it does.
 	 */
 	var drawMap = function(map){
-		var row, col, data;
-		PS.gridPlane(0);
+		paused = true; // pause the enemy timer
+
 		clearScreen();
-		for (row = 0; row <  MAP_SIZE; row++) {
-			for (col = 0; col < MAP_SIZE; col++) {
-				data = (mapArray[map])[row][col];
+
+		let m = mapArray[ map ]; // get map
+		//let i = 0; // index into map
+		//let j = 0;
+		for ( let row = 0; row < MAP_SIZE; row += 1 ) {
+			for ( let col = 0; col < MAP_SIZE; col += 1 ) {
+				let color;
+				let data = m[row][col]; // get map element
 				//PS.debug("map[" + row + "," + col + "]=" + data + "\n");
-				if (data === 0) {
-					var color = (( PS.random( 16 ) - 1 ) + 64);
-					PS.color(col, row, color, color, color) ;
-				} else if(data === 1){
-					var color = (( PS.random( 16 ) - 1 ) + 128);
-					PS.color(col, row, color, color, color);
-				} else if(data === 2){
-					var color = (( PS.random( 16 ) - 1 ) + 168);
-					PS.color(col, row, color, color, color);
-					PS.data(col, row, "exit");
-				} else if(data === 3){
-					var color = (( PS.random( 16 ) - 1 ) + 168);
-					PS.color(col, row, color, color, color);
-					PS.data(col, row, "enter");
-				} else if(data === 4){
-					var color = (( PS.random( 16 ) - 1 ) + 128);
-					PS.color(col, row, color, color, color);
-					PS.data(col, row, "enemy");
+				if ( data === MAP_WALL ) {
+					color = ( ( PS.random( 16 ) - 1 ) + 64 );
+					PS.color( col, row, color, color, color );
+					PS.data( col, row, "wall" ); // use this to identify walls
 				}
+				else if ( data === MAP_FLOOR ) {
+					color = ( ( PS.random( 16 ) - 1 ) + 128 );
+					PS.color( col, row, color, color, color );
+				}
+				else if ( data === MAP_EXIT ) {
+					color = ( ( PS.random( 16 ) - 1 ) + 168 );
+					PS.color( col, row, color, color, color );
+					PS.data( col, row, "exit" );
+				}
+				else if ( data === MAP_ENTER ) {
+					color = ( ( PS.random( 16 ) - 1 ) + 168 );
+					PS.color( col, row, color, color, color );
+					actor_x = col;
+					actor_y = row;
+					PS.spriteMove( player, col, row ); // move player to entrance
+				}
+				else if ( data === MAP_ENEMY ) {
+					color = ( ( PS.random( 16 ) - 1 ) + 128 ); // color as floor space
+					PS.color( col, row, color, color, color );
+
+					if ( e_count >= MAX_ENEMIES ) {
+						PS.debug( "Too many enemies!\n" ); // in case you run out
+						return;
+					}
+					let e = enemies[ e_count ];
+					e.x = col;
+					e.y = row;
+					PS.spriteMove( e.sprite, col, row ); // move sprite to new position
+					PS.spriteShow( e.sprite, true ); // and show it
+					e_count += 1; // update enemy count
+				}
+				else {
+					PS.debug( "Unknown item at " + col + ", " + row + " : "); // in case you make a mistake
+					PS.debug(data + "\n");
+				}
+				//j += 1; // point to next map element
 			}
+			//i++;
 		}
-		PS.gridPlane(1);
-		placeChars();
 		toggleVision();
+		paused = false; // restart the timer
 	}
 
 	/**
-	 * Clears the screen to prepare for the next thing (screen or map)
+	 * Clears the screen to prepare for the next thing (screen or map) TODO make this into one function
 	 */
 	var clearScreen = function() {
-		PS.gridPlane(0);
-		for(let x = 0; x < MAP_SIZE; x++){
-			for(let y = 0; y < MAP_SIZE; y++){
-				PS.color(x,y,0xEEEEEE);
-				PS.glyph(x,y, PS.DEFAULT);
-				PS.border(x,y,0);
-			}
+		PS.color( PS.ALL, PS.ALL, 0xEEEEEE );
+		PS.border( PS.ALL, PS.ALL, 0 );
+		PS.glyph( PS.ALL, PS.ALL, 0 );
+		PS.data( PS.ALL, PS.ALL, 0 );
+		// Reset all active enemies
+		for ( let i = 0; i < e_count; i += 1 ) {
+			let e = enemies[ i ];
+			PS.spriteShow( e.sprite, false ); // hide the sprite; prevents collisions
+			e.path = null;
+			e.step = 0;
+			e.x = -1;
+			e.y = -1;
 		}
-		PS.gridPlane(1);
-		PS.alpha(PS.ALL, PS.ALL, 0);
-		PS.data(PS.ALL, PS.ALL, PS.DEFAULT);
-		PS.gridPlane(0);
+		e_count = 0; // reset enemy count
 		//PS.debug("Screen cleared!");
 	};
 
 	/**
 	 * Places the enemies on the map.
 	 */
-	var placeChars = function(){
+	/*var placeChars = function(){
 		var row, col, data;
 		for(let i = 0; i < enemies.length; i++){
 			PS.spriteDelete(enemies[i].e);
 		}
-		for(let i = 0; i < enemies.length; i++){
-			PS.spriteDelete(enemies[i].e);
-		}
+		//May have fixed the loading bug here
+		enemies = [];
+		PS.debug("enemies is empty" + enemies);
 		for (row = 0; row <  MAP_SIZE; row++) {
 			for (col = 0; col < MAP_SIZE; col++) {
 				data = PS.data(col, row);
@@ -237,17 +280,15 @@ var G = (function () {
 				break;
 			}
 		}
-	}
+	} */
 
 	/**
-	 * Creates a win screen where you can shoot fireworks by pressing space.
+	 * Creates a win screen where you can shoot fireworks by pressing space.TODO make this into one function
 	 */
 	var endScreen = function(){
-		PS.debug("End");
-		PS.spriteDelete(player);
-		for(let i = 0; i < enemies.length; i++){
-			PS.spriteDelete(enemies[i].e);
-		}
+		//PS.debug("End");
+		PS.spriteShow( player, false ); // hide player sprite
+		PS.statusText("You Win!");
 		clearScreen();
 	}
 
@@ -256,66 +297,51 @@ var G = (function () {
 	 * @param x
 	 * @param y
 	 */
-	var move = function(x, y){
-		let nx, ny;
-		let location = PS.spriteMove(player);
-		nx = location.x + x;
-		ny = location.y + y;
+	var move = function(x, y) {
+		let nx = actor_x + x;
+		let ny = actor_y + y;
 
-		/*PS.debug("chosen" + nx + " " + ny + "\n")
-		PS.debug("player" + playerX + " " + playerY + "\n")
-		PS.debug("input" + x + " " + y + "\n")*/
-
-
-		//Needs plane 0 to look at walls
-		PS.gridPlane(0);
 		//Check out of grid
-		if ((nx < 0) || (nx >= MAP_SIZE) ||
-			(ny < 0) || (ny >= MAP_SIZE)){
+
+		if ((nx < 0) || (nx >= MAP_SIZE) || (ny < 0) || (ny >= MAP_SIZE)) {
 			return;
 		}
-		//Check walls
-		let colorArr = [];
-		PS.unmakeRGB(PS.color(nx, ny), colorArr);
-		if(colorArr[0] < 127){
+
+		// Check walls
+
+		let data = PS.data(nx, ny);
+		if (data === "wall") {
 			return;
 		}
-		//Everything else is on the upper plane.
-		PS.gridPlane(1);
-		//Actually move
-		//PS.alpha(playerX, playerY, 0);
-		//PS.data(playerX, playerY, PS.DEFAULT);
-		//PS.data(nx, ny, "player");
-		//PS.color(nx, ny, 0xEEEEEE);
-		//PS.alpha(nx, ny, PS.ALPHA_OPAQUE);
-		PS.spriteMove(player, nx, ny);
-		//playerX = nx;
-		//playerY = ny;
-		location = PS.spriteMove(player);
+
+		actor_x = nx;
+		actor_y = ny;
+		PS.spriteMove(player, actor_x, actor_y);
+
 		//Check if we just moved onto the end, and advance the level
-		if(PS.data(location.x, location.y) === "exit"){
-			currentMap++
-			//PS.timerStop(timer);
-			if(currentMap === mapArray.length){
+
+		if (data === "exit") {
+			currentMap += 1;
+			if (currentMap === mapArray.length) {
 				endScreen();
 			} else {
-				drawMap(currentMap)
+				drawMap(currentMap);
 			}
+			return;
 		}
 
-		//TODO uncomment and fix this? Might not need fixing
-		/*Make a path to the player
-		for(let i = 0; i < enemies.length; i++){
-			let locationE = PS.spriteMove(enemies[i].e);
-			var line;
+		// Make all active sprites chase player
 
-			line = PS.line(locationE.x, locationE.y, location.x, location.y);
-
-			if ( line.length > 0 ) {
-				enemies[i].line = line;
-				enemies[i].step = 0; // start at beginning
+		for (let i = 0; i < e_count; i += 1) {
+			let e = enemies[i];
+			if (PS.spriteShow(e.sprite)) {
+				let line = PS.line(e.x, e.y, actor_x, actor_y);
+				if (line.length > 0) {
+					e.line = line;
+					e.step = 0;
+				}
 			}
-		} */
+		}
 	}
 
 	/**
@@ -326,25 +352,26 @@ var G = (function () {
 		lives = lives + value;
 		let lifeDisplay = [];
 		for(let i = 0; i < lives; i++){
-			lifeDisplay.push('❤️');
+			lifeDisplay.push('♡️');
 		}
-		PS.debug("Lives changed by" + value + "\n");
-		PS.debug(lifeDisplay + "\n");
+		//PS.debug("Lives changed by" + value + "\n");
+		//PS.debug(lifeDisplay + "\n");
 		PS.statusText(lifeDisplay);
+		PS.statusColor(PS.COLOR_WHITE);
 		if(lives === 0){
 			loseScreen();
 		}
 	}
 
 	/**
-	 * Displays the lose screen
+	 * Displays the lose screen TODO make this into one function
 	 */
 	var loseScreen = function(){
-		PS.debug("Lose");
-		clearScreen();
-		PS.color(PS.ALL, PS.ALL, PS.COLOR_BLACK);
-		PS.statusText("Game Over!")
-		PS.statusColor(0xD5D5D5)
+		PS.spriteShow( player, false ); // hide player
+		clearScreen(); // hides all enemies
+		PS.color( PS.ALL, PS.ALL, PS.COLOR_BLACK );
+		PS.statusColor( 0xD5D5D5 );
+		PS.statusText( "Game Over!" );
 	}
 
 	/**
@@ -353,15 +380,78 @@ var G = (function () {
 	var toggleVision = function(){
 		//This does nothing at the moment because the vision system isn't implemented.
 		//However it is here because it will be necessary eventually and adding it now makes it easier.
-		//TODO make this multiple timers for each enemy
-		//timer = PS.timerStart(50, triggerMovement);
-
 	}
 
+	let paused = false;
+
 	/**
-	 * Moves the enemies on a timer triggered in toggleVision
+	 * Stops an enemy if it has hit a wall or the edge of the map
+	 * @param e
 	 */
-	var triggerMovement = function() {
+	const stop_enemy = function ( e ) {
+		e.line = null;
+		e.step = 0;
+	};
+
+	/**
+	 * Moves the enemies on a timer
+	 */
+	const _clock = function () {
+		if ( paused ) {
+			return;
+		}
+
+		// Move all active enemies along their current path (if any)
+
+		for ( let i = 0; i < e_count; i += 1 ) {
+			let e = enemies[ i ];
+			if ( PS.spriteShow( e.sprite ) && e.line ) { // enemy visible and path ready (not null)?
+
+				// Check for end of path
+
+				if ( e.step >= e.line.length ) {
+					stop_enemy( e );
+					continue; // move on to next enemy
+				}
+
+				let p = e.line[ e.step ]; // get next step in path
+				let nx = p[ 0 ]; // next x-pos
+				let ny = p[ 1 ]; // next y-pos
+
+				// If actor already at next pos,
+				// path is exhausted, so stop enemy
+
+				if ( ( actor_x === nx ) && ( actor_y === ny ) ) {
+					stop_enemy( e );
+					continue; // move on to next enemy
+				}
+
+				// Check out of grid
+
+				if ( ( nx < 0 ) || ( nx >= MAP_SIZE ) || ( ny < 0 ) || ( ny >= MAP_SIZE ) ) {
+					stop_enemy( e );
+					continue; // move on to next enemy
+				}
+
+				// check for wall, stop enemy
+
+				let data = PS.data( nx, ny );
+				if ( data === "wall" ) {
+					stop_enemy( e );
+					continue; // move on to next enemy
+				}
+
+				// Move enemy, update position
+
+				PS.spriteMove( e.sprite, nx, ny );
+				e.x = nx;
+				e.y = ny;
+			}
+		}
+	};
+
+	//Removed function
+	/*var triggerMovement = function() {
 		for (let i = 0; i < enemies.length; i++) {
 			//PS.debug(enemies[i].x + ", " + enemies[i].y + "\n");
 			let location = PS.spriteMove(enemies[i].e);
@@ -413,28 +503,41 @@ var G = (function () {
 				}
 			}
 		}
-	}
+	} */
 
 	/**
 	 * Eliminates any enemies surrounding the player (doesn't work)
 	 */
-	var eliminate = function(){
-		let location = PS.spriteMove(player);
-		for(let y = location.y - 2; y <= location.y + 2; y++){
-			for(let x = location.x - 2; x <= location.x + 2; x++){
-				for(let i = 0; i < enemies.length; i++){
-					if(PS.spriteMove(enemies[i].e).x === x && PS.spriteMove(enemies[i].e).y === y){
-						PS.spriteDelete(enemies[i].e);
-						enemies.splice(i, 1);
-						//PS.debug("" + enemies);
+	const eliminate = function(){
+		for ( let y = actor_y - 2; y < ( actor_y + 3 ); y += 1 ) {
+			for ( let x = actor_x - 2; x < ( actor_x + 3 ); x += 1 ) {
+				// Only check locations on the map
+				if ( ( x >= 0 ) && ( x < MAP_SIZE ) && ( y >= 0 ) && ( y < MAP_SIZE ) ) {
+					// Don't check if location is a wall
+					if ( PS.data( x, y ) !== "wall" ) {
+						// Look for visible sprites at this location
+						for ( let i = 0; i < e_count; i += 1 ) {
+							let e = enemies[ i ];
+							if ( PS.spriteShow( e.sprite ) && ( e.x === x ) && ( e.y === y ) ) {
+								PS.spriteShow( e.sprite, false ); // hide sprite; dead!
+							}
+						}
 					}
 				}
 			}
 		}
-	}
+	};
 
+	/**
+	 * Deals damage to the player when they walk next to an enemy
+	 * @param s1
+	 * @param p1
+	 * @param s2
+	 * @param p2
+	 * @param type
+	 */
 	var damage = function(s1, p1, s2, p2, type){
-		PS.debug("Called increment from collision");
+		//PS.debug("Called increment from collision; ");
 		incrementLives(-1);
 	}
 
@@ -447,29 +550,53 @@ var G = (function () {
 		 * @param system
 		 * @param options
 		 */
-		init : function(system, options){
+		init: function (system, options) {
 			const TEAM = "TeamDomino";
 
-			PS.gridSize( MAP_SIZE, MAP_SIZE );
+			PS.gridSize(MAP_SIZE, MAP_SIZE);
 
 			PS.debug("called increment from init");
 			incrementLives(0);
 
 			PS.gridColor(0x242424);
 
+			// *BM* set up player sprite only once!
+
+			player = PS.spriteSolid( 1, 1 );
+			PS.spriteSolidColor( player, PS.COLOR_WHITE );
+			PS.spritePlane( player, PLANE_ACTOR );
+			PS.spriteCollide( player, damage );
+
+			// Create a pool of re-usable enemies
+
+			for ( let i = 0; i < MAX_ENEMIES; i += 1 ) {
+				let s = PS.spriteSolid( 1, 1 );
+				PS.spritePlane( s, PLANE_ENEMY );
+				PS.spriteSolidColor( s, COLOR_ENEMY );
+				enemies.push( {
+					sprite : s,
+					line : null,
+					step : 0,
+					x : 0, // x-pos of enemy
+					y : 0 // y-pos of enemy
+				} );
+			}
+
 			drawMap(currentMap);
+
+			//timer = PS.timerStart( 50, _clock ); // start the timer
 
 			// This code should be the last thing
 			// called by your PS.init() handler.
 			// DO NOT MODIFY IT, except for the change
 			// explained in the comment below.
-			PS.dbLogin( "imgd2900", TEAM, function ( id, user ) {
-				if ( user === PS.ERROR ) {
+			PS.dbLogin("imgd2900", TEAM, function (id, user) {
+				if (user === PS.ERROR) {
 					return;
 				}
-				PS.dbEvent( TEAM, "startup", user );
-				PS.dbSend( TEAM, PS.CURRENT, { discard : true } );
-			}, { active : false } );
+				PS.dbEvent(TEAM, "startup", user);
+				PS.dbSend(TEAM, PS.CURRENT, {discard: true});
+			}, {active: true});
 			// Change the false in the final line above to true
 			// before deploying the code to your Web site.
 		},
@@ -481,8 +608,8 @@ var G = (function () {
 		 * @param ctrl
 		 * @param options
 		 */
-		keyDown : function(key, shift, ctrl, options){
-			switch ( key ) {
+		keyDown: function (key, shift, ctrl, options) {
+			switch (key) {
 				case PS.KEY_ARROW_UP:
 				case 119:
 				case 87: {
@@ -508,15 +635,14 @@ var G = (function () {
 				case 100:
 				case 68: {
 					// Code to move things RIGHT
-					move(1,0);
+					move(1, 0);
 					break;
 				}
-				case 32: {
+				case PS.KEY_SPACE: {
 					eliminate();
 				}
 			}
 		},
-
 
 	}
 
