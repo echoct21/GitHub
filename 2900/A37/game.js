@@ -51,6 +51,8 @@ var G = (function () {
 
 	const COLOR_ACTOR = PS.COLOR_WHITE;
 	const COLOR_ENEMY = PS.COLOR_BLACK;
+	const VIEW_DISTANCE = 4;
+	const VIEW_MULTIPLIER = 45;
 
 	let timer;
 
@@ -59,12 +61,14 @@ var G = (function () {
 	const MAP_EXIT = 2;
 	const MAP_ENTER = 3;
 	const MAP_ENEMY = 4;
+	const MAP_WARP = 5;
 
 	const w = MAP_WALL;
 	const f = MAP_FLOOR;
 	const x = MAP_EXIT;
 	const n = MAP_ENTER;
 	const e = MAP_ENEMY;
+	const t = MAP_WARP;
 	const ROOM1 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
@@ -106,14 +110,14 @@ var G = (function () {
 		[w, f, f, f, f, f, f, w, f, f, f, f, f, f, f, w],
 		[w, f, f, w, f, f, f, f, f, f, w, f, f, f, f, w],
 		[w, f, f, w, w, w, w, w, w, w, w, w, w, f, f, w],
-		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
-		[w, f, f, f, e, f, e, f, e, f, e, f, w, f, f, w],
-		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
-		[n, f, f, f, f, e, f, e, f, e, f, e, f, f, f, x],
-		[n, f, f, f, f, f, f, f, f, f, f, f, f, f, f, x],
-		[w, f, f, f, e, f, e, f, e, f, e, f, f, f, f, w],
-		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
-		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, e, f, e, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, f, f, f, w],
+		[n, f, f, w, f, e, f, f, f, e, f, e, f, f, f, x],
+		[n, f, f, w, f, f, f, f, f, f, f, f, f, f, f, x],
+		[w, f, f, w, f, f, e, f, e, f, f, f, f, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
 		[w, f, f, w, w, w, w, w, w, w, w, w, w, f, f, w],
 		[w, f, f, w, f, f, f, f, f, f, f, w, f, f, f, w],
 		[w, f, f, f, f, f, w, f, f, f, f, f, f, f, f, w],
@@ -137,7 +141,79 @@ var G = (function () {
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
 	]
-	const mapArray = [ROOM1, ROOM2, ROOM3, ROOM4];
+	const ROOM5 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, x],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, x],
+		[w, f, f, w, w, w, w, w, w, w, f, f, w, f, f, w],
+		[w, f, f, w, e, f, f, f, f, w, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, w, f, f, w, f, f, w],
+		[w, f, f, w, f, f, w, f, f, w, e, f, w, f, f, w],
+		[w, f, f, w, f, f, w, n, n, w, f, f, w, f, f, w],
+		[w, f, f, w, f, f, w, n, n, w, f, f, w, f, f, w],
+		[w, f, f, w, f, f, w, w, w, w, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, e, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, w, w, w, w, w, w, w, w, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, e, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	const ROOM6 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[n, f, f, f, f, f, f, f, f, f, f, f, f, e, e, w],
+		[n, f, f, f, f, f, f, f, f, f, f, f, f, e, e, x],
+		[w, f, f, w, w, w, w, f, f, f, f, f, f, f, f, x],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, e, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, x],
+		[w, f, f, w, f, f, f, w, w, w, f, f, w, f, f, x],
+		[w, f, f, f, f, f, f, w, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, w, f, f, e, f, w, f, f, w],
+		[w, f, f, f, f, w, f, w, f, f, f, f, w, f, f, w],
+		[w, f, f, f, e, w, f, f, f, f, w, w, w, f, f, w],
+		[w, f, f, e, f, w, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, f, f, w, f, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+		]
+	const ROOM7 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, f, f, f, f, f, f, w, f, f, f, f, f, f, f, w],
+		[n, f, f, w, f, e, f, w, f, f, w, f, f, t, f, w],
+		[n, f, f, w, w, w, w, w, w, w, w, w, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, w, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, e, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, x],
+		[w, w, w, w, f, f, f, w, w, w, f, f, w, f, f, x],
+		[w, f, f, w, f, f, f, w, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, w, f, t, f, e, w, f, f, w],
+		[w, f, f, f, f, f, f, w, f, f, f, f, w, e, e, w],
+		[w, f, f, w, w, w, w, w, w, w, w, w, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, w, f, w, f, f, f, w],
+		[w, f, f, f, f, f, w, f, f, w, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	const ROOM8 = [
+		[w, w, w, w, w, w, w, x, x, w, w, w, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, w, w, w, f, f, f, f, w, w, w, f, f, w],
+		[w, f, f, w, e, f, f, f, f, f, f, e, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[n, f, f, f, f, f, f, w, w, f, f, f, f, f, f, x],
+		[n, f, f, f, f, f, f, w, w, f, f, f, f, f, f, x],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, e, f, f, f, f, f, f, e, w, f, f, w],
+		[w, f, f, w, w, w, f, f, f, f, w, w, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, x, x, w, w, w, w, w, w, w]
+	]
+	const mapArray = [ROOM1, ROOM2, ROOM3, ROOM4, ROOM5, ROOM6, ROOM7, ROOM8];
 	let currentMap = 0;
 
 	// Create a pool of sprite objects that can be re-used over and over again
@@ -149,6 +225,7 @@ var G = (function () {
 	let actor_x;
 	let actor_y;
 	let lives = 3;
+	let gameActive = false;
 
 	/**
 	 * Draws the map on the board, clearing the screen before it does.
@@ -157,6 +234,8 @@ var G = (function () {
 		paused = true; // pause the enemy timer
 
 		clearScreen();
+
+		gameActive = true;
 
 		let m = mapArray[ map ]; // get map
 		//let i = 0; // index into map
@@ -167,28 +246,28 @@ var G = (function () {
 				let data = m[row][col]; // get map element
 				//PS.debug("map[" + row + "," + col + "]=" + data + "\n");
 				if ( data === MAP_WALL ) {
-					color = ( ( PS.random( 16 ) - 1 ) + 64 );
+					color = ( ( PS.random( 16 ) - 1 ) + 44 );
 					PS.color( col, row, color, color, color );
 					PS.data( col, row, "wall" ); // use this to identify walls
 				}
 				else if ( data === MAP_FLOOR ) {
-					color = ( ( PS.random( 16 ) - 1 ) + 128 );
+					color = ( ( PS.random( 16 ) - 1 ) + 148 );
 					PS.color( col, row, color, color, color );
 				}
 				else if ( data === MAP_EXIT ) {
-					color = ( ( PS.random( 16 ) - 1 ) + 168 );
+					color = ( ( PS.random( 16 ) - 1 ) + 148 );
 					PS.color( col, row, color, color, color );
 					PS.data( col, row, "exit" );
 				}
 				else if ( data === MAP_ENTER ) {
-					color = ( ( PS.random( 16 ) - 1 ) + 168 );
+					color = ( ( PS.random( 16 ) - 1 ) + 178 );
 					PS.color( col, row, color, color, color );
 					actor_x = col;
 					actor_y = row;
 					PS.spriteMove( player, col, row ); // move player to entrance
 				}
 				else if ( data === MAP_ENEMY ) {
-					color = ( ( PS.random( 16 ) - 1 ) + 128 ); // color as floor space
+					color = ( ( PS.random( 16 ) - 1 ) + 148 ); // color as floor space
 					PS.color( col, row, color, color, color );
 
 					if ( e_count >= MAX_ENEMIES ) {
@@ -201,8 +280,11 @@ var G = (function () {
 					PS.spriteMove( e.sprite, col, row ); // move sprite to new position
 					PS.spriteShow( e.sprite, true ); // and show it
 					e_count += 1; // update enemy count
-				}
-				else {
+				} else if(data === MAP_WARP){
+					PS.color(col, row, 0xf2f2f2);
+					PS.glyph(col, row, "@");
+					PS.data(col, row, "warp");
+				} else {
 					PS.debug( "Unknown item at " + col + ", " + row + " : "); // in case you make a mistake
 					PS.debug(data + "\n");
 				}
@@ -210,7 +292,7 @@ var G = (function () {
 			}
 			//i++;
 		}
-		toggleVision();
+		drawVision(false);
 		paused = false; // restart the timer
 	}
 
@@ -223,7 +305,8 @@ var G = (function () {
 		PS.glyph( PS.ALL, PS.ALL, 0 );
 		PS.data( PS.ALL, PS.ALL, 0 );
 		// Reset all active enemies
-		for ( let i = 0; i < e_count; i += 1 ) {
+		for ( let i = 0; i < enemies.length; i += 1 ) {
+			//PS.debug("E-count: " + e_count + " length: " + enemies.length);
 			let e = enemies[ i ];
 			PS.spriteShow( e.sprite, false ); // hide the sprite; prevents collisions
 			e.path = null;
@@ -236,7 +319,7 @@ var G = (function () {
 	};
 
 	/**
-	 * Places the enemies on the map.
+	 * Places the enemies on the map.          REMOVED
 	 */
 	/*var placeChars = function(){
 		var row, col, data;
@@ -287,6 +370,8 @@ var G = (function () {
 	 */
 	var endScreen = function(){
 		//PS.debug("End");
+		gameActive = false;
+		drawVision(false);
 		PS.spriteShow( player, false ); // hide player sprite
 		PS.statusText("You Win!");
 		clearScreen();
@@ -298,6 +383,10 @@ var G = (function () {
 	 * @param y
 	 */
 	var move = function(x, y) {
+		if(!gameActive)
+			return;
+
+
 		let nx = actor_x + x;
 		let ny = actor_y + y;
 
@@ -329,6 +418,25 @@ var G = (function () {
 			}
 			return;
 		}
+
+		if(data === "warp"){
+			PS.data(actor_x, actor_y, PS.DEFAULT);
+			for(let col = 0; col < MAP_SIZE; col++){
+				for(let row = 0; row < MAP_SIZE; row++){
+					if(PS.data(col, row) === "warp"){
+						//PS.debug("Col: " + col + ", Row: " + row);
+						actor_x = col;
+						actor_y = row;
+						PS.spriteMove(player, actor_x, actor_y);
+						PS.audioPlay("fx_powerup4");
+						drawVision(true);
+					}
+				}
+			}
+		}
+
+		//Turn the vision on as soon as they move, and with every movement after.
+		drawVision(true);
 
 		// Make all active sprites chase player
 
@@ -367,6 +475,7 @@ var G = (function () {
 	 * Displays the lose screen TODO make this into one function
 	 */
 	var loseScreen = function(){
+		gameActive = false;
 		PS.spriteShow( player, false ); // hide player
 		clearScreen(); // hides all enemies
 		PS.color( PS.ALL, PS.ALL, PS.COLOR_BLACK );
@@ -375,11 +484,40 @@ var G = (function () {
 	}
 
 	/**
-	 * Shows the map for a few seconds when entering a level.
+	 * Creates the vision layer on top of the map, or turns it off.
+	 * @param isOn : boolean true if making everything dark, false if lighting it up.
 	 */
-	var toggleVision = function(){
-		//This does nothing at the moment because the vision system isn't implemented.
-		//However it is here because it will be necessary eventually and adding it now makes it easier.
+	var drawVision = function(isOn) {
+		PS.gridPlane(3);
+		if(isOn) {
+			PS.color(PS.ALL, PS.ALL, PS.COLOR_BLACK);
+			PS.alpha(PS.ALL, PS.ALL, PS.ALPHA_OPAQUE);
+			//Draw the vision "circle"
+			for (let x = actor_x - VIEW_DISTANCE; x <= actor_x + VIEW_DISTANCE; x++) {
+				for (let y = actor_y - VIEW_DISTANCE; y <= actor_y + VIEW_DISTANCE; y++) {
+					if ((x > -1 && y > -1) && (x < MAP_SIZE && y < MAP_SIZE)) {
+						let level = getVision(Math.abs(actor_x - x), Math.abs(actor_y - y));
+						//PS.debug("Level: " + level + " X: " + x + " Y: " + y + "\n");
+						//PS.debug("Actor x + y: " + actor_x + " " + actor_y);
+						PS.alpha(x, y, level);
+					}
+				}
+			}
+		} else {
+			PS.alpha(PS.ALL, PS.ALL, 0);
+		}
+		PS.gridPlane(0);
+	}
+
+	/**
+	 * Calculates the opacity at certain distances from the player.
+	 * @param x x location relative to player
+	 * @param y y location relative to player
+	 * @returns {number} opacity at location
+	 */
+	const getVision = function(x, y){
+		let distance =  Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+		return VIEW_MULTIPLIER * distance;
 	}
 
 	let paused = false;
@@ -426,6 +564,14 @@ var G = (function () {
 					continue; // move on to next enemy
 				}
 
+				// Check if another enemy is at the next position and stop so that they cannot stack.
+				for(let j = 0; j < e_count; j++){
+					if(enemies[i].x === nx && enemies[i].y === ny){
+						stop_enemy(e)
+						continue;
+					}
+				}
+
 				// Check out of grid
 
 				if ( ( nx < 0 ) || ( nx >= MAP_SIZE ) || ( ny < 0 ) || ( ny >= MAP_SIZE ) ) {
@@ -450,67 +596,12 @@ var G = (function () {
 		}
 	};
 
-	//Removed function
-	/*var triggerMovement = function() {
-		for (let i = 0; i < enemies.length; i++) {
-			//PS.debug(enemies[i].x + ", " + enemies[i].y + "\n");
-			let location = PS.spriteMove(enemies[i].e);
-			if (enemies[i].line) { // path ready (not null)?
-				// Get next point on path
-				let p = enemies[i].line[enemies[i].step];
-				let nx = p[0]; // next x-pos
-				let ny = p[1]; // next y-pos
-				// If actor already at next pos,
-				// path is exhausted, so nuke it
-				if ((location.x === nx) && (location.y === ny)){
-					enemies[i].line = null;
-					return;
-				}
-
-				// Move sprite to next position
-				PS.gridPlane(0);
-				//Check out of grid
-				if ((nx < 0) || (nx >= MAP_SIZE) ||
-					(ny < 0) || (ny >= MAP_SIZE)){
-					return;
-				}
-				//Check walls
-				let colorArr = [];
-				PS.unmakeRGB(PS.color(nx, ny), colorArr);
-				if(colorArr[0] < 127){
-					return;
-				}
-				//Check player
-				//if(PS.data(nx, ny) == "player");
-				//Everything else is on the upper plane.
-				PS.gridPlane(1);
-
-				PS.spriteMove(enemies[i].e, nx, ny);
-				//PS.data(location.x, enemies[i].y, PS.DEFAULT);
-				//PS.alpha(location.x, enemies[i].y, 0);
-				//PS.color(nx, ny, PS.COLOR_BLACK);
-				//PS.alpha(nx, ny, PS.ALPHA_OPAQUE);
-
-				//enemies[i].x = nx; // update xpos
-				//enemies[i].y = ny; // and ypos
-
-				enemies[i + 2] += 1; // point to next step
-
-				// If no more steps, nuke path
-
-				if (enemies[i].step >= enemies[i].line.length - 1) {
-					enemies[i].line = null;
-				}
-			}
-		}
-	} */
-
 	/**
 	 * Eliminates any enemies surrounding the player (doesn't work)
 	 */
 	const eliminate = function(){
-		for ( let y = actor_y - 2; y < ( actor_y + 3 ); y += 1 ) {
-			for ( let x = actor_x - 2; x < ( actor_x + 3 ); x += 1 ) {
+		for ( let y = actor_y - 1; y < ( actor_y + 2 ); y += 1 ) {
+			for ( let x = actor_x - 1; x < ( actor_x + 2 ); x += 1 ) {
 				// Only check locations on the map
 				if ( ( x >= 0 ) && ( x < MAP_SIZE ) && ( y >= 0 ) && ( y < MAP_SIZE ) ) {
 					// Don't check if location is a wall
@@ -520,6 +611,7 @@ var G = (function () {
 							let e = enemies[ i ];
 							if ( PS.spriteShow( e.sprite ) && ( e.x === x ) && ( e.y === y ) ) {
 								PS.spriteShow( e.sprite, false ); // hide sprite; dead!
+								PS.audioPlay("fx_bang");
 							}
 						}
 					}
@@ -538,7 +630,10 @@ var G = (function () {
 	 */
 	var damage = function(s1, p1, s2, p2, type){
 		//PS.debug("Called increment from collision; ");
-		incrementLives(-1);
+		if(type === PS.SPRITE_OVERLAP) {
+			incrementLives(-1);
+			PS.audioPlay("fx_scratch");
+		}
 	}
 
 	// BREAK BETWEEN FUNCTIONS AND EXPORTS
@@ -555,10 +650,15 @@ var G = (function () {
 
 			PS.gridSize(MAP_SIZE, MAP_SIZE);
 
-			PS.debug("called increment from init");
+			//PS.debug("called increment from init");
+			// Activate the life counter by incrementing it by zero (not changing it at all)
 			incrementLives(0);
 
 			PS.gridColor(0x242424);
+
+			PS.audioLoad("fx_scratch");
+			PS.audioLoad("fx_bang");
+			PS.audioLoad("fx_powerup4")
 
 			// *BM* set up player sprite only once!
 
@@ -584,7 +684,9 @@ var G = (function () {
 
 			drawMap(currentMap);
 
-			//timer = PS.timerStart( 50, _clock ); // start the timer
+			timer = PS.timerStart( 50, _clock ); // start the timer
+
+			PS.keyRepeat(true, 10, 7); //set the key repeat times.
 
 			// This code should be the last thing
 			// called by your PS.init() handler.
