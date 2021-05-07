@@ -55,6 +55,7 @@ var G = (function () {
 	const VIEW_MULTIPLIER = 45;
 
 	let timer;
+	let paused = false;
 
 	const MAP_WALL = 0;
 	const MAP_FLOOR = 1;
@@ -231,7 +232,7 @@ var G = (function () {
 	 * Draws the map on the board, clearing the screen before it does.
 	 */
 	var drawMap = function(map){
-		paused = true; // pause the enemy timer
+		//paused = true; // pause the enemy timer
 
 		clearScreen();
 
@@ -293,7 +294,6 @@ var G = (function () {
 			//i++;
 		}
 		drawVision(false);
-		paused = false; // restart the timer
 	}
 
 	/**
@@ -375,6 +375,7 @@ var G = (function () {
 		PS.spriteShow( player, false ); // hide player sprite
 		PS.statusText("You Win!");
 		clearScreen();
+		PS.timerStop(timer);
 	}
 
 	/**
@@ -383,6 +384,7 @@ var G = (function () {
 	 * @param y
 	 */
 	var move = function(x, y) {
+		paused = false; // restart the timer
 		if(!gameActive)
 			return;
 
@@ -411,10 +413,12 @@ var G = (function () {
 
 		if (data === "exit") {
 			currentMap += 1;
+			paused = true;
 			if (currentMap === mapArray.length) {
 				endScreen();
 			} else {
 				drawMap(currentMap);
+				PS.debug("Paused status is " + paused + "\n");
 			}
 			return;
 		}
@@ -481,6 +485,7 @@ var G = (function () {
 		PS.color( PS.ALL, PS.ALL, PS.COLOR_BLACK );
 		PS.statusColor( 0xD5D5D5 );
 		PS.statusText( "Game Over!" );
+		PS.timerStop(timer);
 	}
 
 	/**
@@ -520,8 +525,6 @@ var G = (function () {
 		return VIEW_MULTIPLIER * distance;
 	}
 
-	let paused = false;
-
 	/**
 	 * Stops an enemy if it has hit a wall or the edge of the map
 	 * @param e
@@ -535,6 +538,8 @@ var G = (function () {
 	 * Moves the enemies on a timer
 	 */
 	const _clock = function () {
+		PS.debug("Paused status is " + paused + "\n");
+
 		if ( paused ) {
 			return;
 		}
@@ -559,10 +564,10 @@ var G = (function () {
 				// If actor already at next pos,
 				// path is exhausted, so stop enemy
 
-				if ( ( actor_x === nx ) && ( actor_y === ny ) ) {
+				/*if ( ( actor_x === nx ) && ( actor_y === ny ) ) {
 					stop_enemy( e );
 					continue; // move on to next enemy
-				}
+				} */
 
 				// Check if another enemy is at the next position and stop so that they cannot stack.
 				for(let j = 0; j < e_count; j++){
@@ -592,6 +597,7 @@ var G = (function () {
 				PS.spriteMove( e.sprite, nx, ny );
 				e.x = nx;
 				e.y = ny;
+				//PS.debug("Moved enemy " + i);
 			}
 		}
 	};
@@ -684,7 +690,7 @@ var G = (function () {
 
 			drawMap(currentMap);
 
-			timer = PS.timerStart( 50, _clock ); // start the timer
+			timer = PS.timerStart( 45, _clock ); // start the timer
 
 			PS.keyRepeat(true, 10, 7); //set the key repeat times.
 
