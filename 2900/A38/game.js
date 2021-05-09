@@ -496,10 +496,13 @@ const W = ( function () {
 	const _start_level = function ( val ) {
 		_level = val;
 		if ( !_music && ( _level > 0 ) ) {
-			_music = true;
-			PS.statusText( "Whither" );
-			PS.debug("played music");
-			PS.audioPlayChannel( _channel );
+			let musicTimer = PS.timerStart(135, function () {
+				PS.timerStop(musicTimer);
+				_music = true;
+				PS.statusText( "Whither" );
+				PS.debug("played music");
+				PS.audioPlayChannel( _channel );
+			});
 		}
 
 		// Completely reset grid
@@ -602,8 +605,7 @@ const W = ( function () {
 
 		// One second delay ...
 		if(_level === 20){
-			PS.debug("Called blackout, and stopped music ");
-			//PS.audioPause(_channel);
+			//PS.debug("Called blackout, and stopped music ");
 			return;
 		} else {
 			let timer = PS.timerStart(60, function () {
@@ -768,6 +770,7 @@ const W = ( function () {
 	const _loaded = function ( data ) {
 		if ( data !== PS.ERROR ) {
 			_channel = data.channel; // save channel ID
+			PS.debug("Saved channel");
 		}
 	};
 
