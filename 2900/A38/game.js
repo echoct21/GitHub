@@ -494,13 +494,143 @@ const W = ( function () {
 	// Start specified level
 
 	const _start_level = function ( val ) {
+
+		// Completely reset grid
+
+		PS.gridColor( _COLOR_FLOOR );
+		PS.color( PS.ALL, PS.ALL, _COLOR_FLOOR );
+		PS.alpha( PS.ALL, PS.ALL, PS.ALPHA_OPAQUE );
+		PS.border( PS.ALL, PS.ALL, 0 ); // hide borders
+		PS.borderColor( PS.ALL, PS.ALL, _COLOR_FLOOR_BORDER );
+		PS.borderAlpha( PS.ALL, PS.ALL, PS.ALPHA_OPAQUE );
+		PS.data( PS.ALL, PS.ALL, _IS_FLOOR ); // all floor
+
+		// This code actually starts _level
+		// It's factored out so it can be called after the music loads
+
+		_level = val;
+
+		if ( _level > 0 ) {
+			PS.statusText( "Whither" );
+		}
+
+		const startup = function () {
+			// Init level from data
+
+			let data = _LEVELS[ _level ];
+
+			// Setup actor
+
+			PS.fade( data.actor_x, data.actor_y, 60, { onEnd : function () {
+					PS.fade( data.actor_x, data.actor_y, 0 );
+				} } );
+
+			_place_actor( data.actor_x, data.actor_y, data.actor_size );
+
+			// Setup goal if defined
+
+			_goal_x = data.goal_x;
+			if ( _goal_x !== undefined ) {
+				_goal_y = data.goal_y;
+				_goal_delta = data.goal_delta || 0;
+				PS.color( _goal_x, _goal_y, _COLOR_GOAL );
+				PS.border( _goal_x, _goal_y, _WIDTH_GOAL_BORDER );
+				PS.borderColor( _goal_x, _goal_y, _COLOR_GOAL_BORDER );
+				PS.data( _goal_x, _goal_y, _IS_GOAL ); // set id
+			}
+
+			// Set up walls if any defined
+
+			if ( data.walls !== undefined ) {
+				let len = data.walls.length;
+				for ( let i = 0; i < len; i += 1 ) {
+					let pos = data.walls[ i ];
+					let x = pos[ 0 ];
+					let y = pos[ 1 ];
+					_place_wall( x, y );
+				}
+			}
+
+			// Set up fading walls if any defined
+
+			_fade_walls = data.fade_walls;
+			if ( _fade_walls !== undefined ) {
+				let len = _fade_walls.length;
+				for ( let i = 0; i < len; i += 1 ) {
+					let pos = _fade_walls[ i ];
+					let x = pos[ 0 ];
+					let y = pos[ 1 ];
+					_place_wall( x, y );
+					pos[ 3 ] = true; // mark as active
+				}
+			}
+
+			// Set up foods if any defined
+
+			_foods = data.foods;
+			if ( _foods !== undefined ) {
+				let len = _foods.length;
+				for ( let i = 0; i < len; i += 1 ) {
+					let pos = _foods[ i ];
+					let x = pos[ 0 ];
+					let y = pos[ 1 ];
+					_place_food( x, y );
+					pos[ 3 ] = true; // mark as active
+				}
+			}
+
+			// Set up fading foods if any defined
+
+			_fade_foods = data.fade_foods;
+			if ( _fade_foods !== undefined ) {
+				let len = _fade_foods.length;
+				for ( let i = 0; i < len; i += 1 ) {
+					let pos = _fade_foods[ i ];
+					let x = pos[ 0 ];
+					let y = pos[ 1 ];
+					_place_food( x, y );
+					pos[ 3 ] = true; // mark as active
+				}
+			}
+
+			PS.gridRefresh();
+		};
+
+		// Called when music is loaded
+
+		const _loaded = function ( data ) {
+			if ( data !== PS.ERROR ) {
+				_channel = data.channel; // save channel ID
+				PS.audioPlayChannel( _channel );
+				startup();
+			}
+		};
+
+		if ( !_music ) {
+			_music = true;
+			// NOTE: Whither's music is an honorary member of the PS Audio Library
+
+			PS.audioLoad( "whither", {
+				onLoad : _loaded,
+				loop : true,
+				lock : true,
+				fileTypes : [ "ogg", "mp3" ]
+			} );
+
+			return;
+		}
+
+		startup();
+	};
+
+	/*const _start_level = function ( val ) {
 		_level = val;
 		if ( !_music && ( _level > 0 ) ) {
 			let musicTimer = PS.timerStart(135, function () {
 				PS.timerStop(musicTimer);
 				_music = true;
 				PS.statusText( "Whither" );
-				PS.debug("played music");
+				//PS.debug("played music");
 				PS.audioPlayChannel( _channel );
 			});
 		}
@@ -588,7 +718,7 @@ const W = ( function () {
 				pos[ 3 ] = true; // mark as active
 			}
 		}
-	};
+	};*/
 
 	// Blackout for level fail
 
@@ -600,14 +730,13 @@ const W = ( function () {
 		PS.border( PS.ALL, PS.ALL, 0 );
 		PS.alpha( PS.ALL, PS.ALL, 255 );
 
-		PS.audioPause( _channel ); // pause music
-		//PS.debug("This was supposed to stop music, but might be starting it.")
 
 		// One second delay ...
 		if(_level === 20){
-			//PS.debug("Called blackout, and stopped music ");
+			PS.audioFade(_channel, 1, 0, 5000);
 			return;
 		} else {
+			PS.audioPause( _channel ); // pause music
 			let timer = PS.timerStart(60, function () {
 				PS.timerStop(timer);
 				_start_level(_level); // restart level
@@ -770,7 +899,7 @@ const W = ( function () {
 	const _loaded = function ( data ) {
 		if ( data !== PS.ERROR ) {
 			_channel = data.channel; // save channel ID
-			PS.debug("Saved channel");
+			//PS.debug("Saved channel");
 		}
 	};
 
@@ -785,11 +914,11 @@ const W = ( function () {
 
 			// NOTE: Whither's music is an honorary member of the PS Audio Library
 
-			PS.audioLoad( "whither", {
+			/*PS.audioLoad( "whither", {
 				onLoad : _loaded,
 				loop : true,
 				lock : true
-			} );
+			} );*/
 
 			_max_x = _WIDTH - 1; // establish maximum x
 			_max_y = _HEIGHT - 1; // and y

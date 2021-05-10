@@ -54,8 +54,11 @@ var G = (function () {
 	const VIEW_DISTANCE = 4;
 	const VIEW_MULTIPLIER = 45;
 
+	let ATTACK_RANGE = 1;
+	let deactivate = false;
+
 	let timer;
-	let paused = false;
+	let paused = true;
 
 	const MAP_WALL = 0;
 	const MAP_FLOOR = 1;
@@ -63,6 +66,9 @@ var G = (function () {
 	const MAP_ENTER = 3;
 	const MAP_ENEMY = 4;
 	const MAP_WARP = 5;
+	const MAP_HEALTH = 6;
+ 	const MAP_ATTACK = 7;
+ 	const MAP_COIN = 8;
 
 	const w = MAP_WALL;
 	const f = MAP_FLOOR;
@@ -70,7 +76,10 @@ var G = (function () {
 	const n = MAP_ENTER;
 	const e = MAP_ENEMY;
 	const t = MAP_WARP;
-	//Track 1 (Enter to split)
+	const h = MAP_HEALTH;
+	const a = MAP_ATTACK;
+	const c = MAP_COIN;
+	//Track 0 (Enter to split)
 	const ROOM1 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
@@ -215,24 +224,24 @@ var G = (function () {
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
 		[w, w, w, w, w, w, w, x, x, w, w, w, w, w, w, w]
 	]
-	//Track 2 (Split (above) to end)
+	//Track 1 (Split (above) to end)
 	const ROOM9 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
 		[w, f, f, f, f, f, f, f, e, f, f, f, w, f, f, x],
 		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, x],
 		[w, f, f, w, w, w, w, w, w, f, f, f, w, f, f, w],
-		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, h, f, f, f, f, f, f, w, f, f, w],
 		[w, f, f, w, w, w, f, f, f, f, f, f, w, f, e, w],
-		[n, f, f, f, f, w, f, f, f, f, f, f, w, f, f, w],
-		[n, f, f, f, f, w, f, f, w, f, f, f, w, f, f, w],
+		[w, f, f, f, f, w, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, w, f, f, w, f, f, f, w, f, f, w],
 		[w, f, f, w, f, w, e, f, w, f, f, f, w, f, f, w],
 		[w, f, f, w, f, w, f, f, w, f, f, f, w, f, f, w],
-		[w, e, f, w, f, w, f, w, w, w, w, w, w, f, f, w],
-		[w, f, w, w, f, w, f, f, f, f, f, f, f, f, f, w],
-		[w, f, w, "H", f, w, f, f, f, f, f, f, f, f, f, w],
-		[w, f, w, w, f, w, f, f, f, f, f, f, f, f, f, w],
-		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+		[w, e, f, w, f, w, w, w, w, w, w, w, w, f, f, w],
+		[w, f, w, w, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, w, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, w, w, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, n, n, w, w, w, w, w, w, w]
 	]
 	const ROOM10 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
@@ -241,7 +250,7 @@ var G = (function () {
 		[n, f, f, f, f, f, f, f, f, f, f, w, w, w, w, w],
 		[w, w, w, w, w, w, w, f, f, f, f, w, w, w, w, w],
 		[w, w, w, w, w, w, w, f, f, f, f, w, w, w, w, w],
-		[w, "H", f, f, w, w, w, f,e, f, f, w, w, w, w, w],
+		[w, h, f, f, w, w, w, f,e, f, f, w, w, w, w, w],
 		[w, w, f, w, w, w, w, f, f, f, f, w, w, w, w, w],
 		[w, w, f, f, w, w, w, f, f, f, f, w, w, w, w, w],
 		[w, w, w, f, w, w, w, f, f, f, f, w, w, w, w, w],
@@ -255,7 +264,7 @@ var G = (function () {
 	const ROOM11 = [
 		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
 		[w, f, f, f, w, f, f, f, f, f, f, f, w, f, f, w],
-		[w, f, f, f, w, f, f, f, f, "H", f, f, w, f, f, x],
+		[w, f, f, f, w, f, f, f, f, h, f, f, w, f, f, x],
 		[w, f, f, w, w, w, w, f, f, f, f, f, w, f, f, x],
 		[w, e, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
@@ -294,7 +303,7 @@ var G = (function () {
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
 		[w, f, f, w, w, w, f, f, f, f, w, w, w, w, w, w],
 		[w, f, f, f, e, f, f, f, f, f, f, e, w, w, w, w],
-		[w, f, f, f, f, f, f, f, f, f, f, f, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, a, f, w, w, w, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, w, w, w, w],
 		[n, f, f, f, f, f, f, w, w, w, w, w, w, w, w, w],
 		[n, f, f, f, f, f, f, w, w, w, w, w, w, w, w, w],
@@ -306,23 +315,184 @@ var G = (function () {
 		[w, f, f, f, w, f, f, f, f, f, f, f, f, f, f, w],
 		[w, w, w, w, w, w, w, x, x, w, w, w, w, w, w, w]
 	]
-	//Track3 (Split (below) to end)
-	const ROOM14 = []
-	const ROOM15 = []
-	const ROOM16 = []
-	const ROOM17 = []
-	const ROOM18 = []
-	//Track 4 (Split (center) to end)
-	const ROOM19 = []
-	const ROOM20 = []
-	const ROOM21 = []
-
-	const mapArray = [ROOM1, ROOM2, ROOM3, ROOM4, ROOM5, ROOM6, ROOM7, ROOM8];
-	const mapArrayTwo = []
-	const mapArrayThree = []
-	const mapArrayFour = []
-	const mapTracks = [mapArray, mapArrayTwo, mapArrayThree, mapArrayFour]
+	//Track2 (Split (below) to end)
+	const ROOM14 = [
+		[w, w, w, w, w, w, n, n, w, w, w, w, w, w, w, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, x],
+		[w, f, f, w, f, f, w, w, w, w, w, w, w, f, f, x],
+		[w, f, f, w, e, f, w, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, w, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, w, f, f, w, e, f, w, f, f, w],
+		[w, f, f, w, f, f, w, e, e, w, f, f, w, f, f, w],
+		[w, f, f, w, f, f, w, e, e, w, f, f, w, f, f, w],
+		[w, f, f, f, f, f, w, w, w, w, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, a, f, w, f, f, w],
+		[w, e, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, w, w, w, w, w, w, w, w, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, e, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	const ROOM15 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, f, w, w, w, w, w],
+		[n, f, f, f, f, f, e, f, f, a, f, w, w, w, w, w],
+		[n, f, f, f, f, f, f, f, f, f, f, w, w, w, w, w],
+		[w, w, w, w, w, w, w, f, f, f, f, w, w, w, w, w],
+		[w, w, w, w, w, w, w, f, f, f, f, w, w, w, w, w],
+		[w, f, f, f, w, w, w, f, e, f, f, w, w, w, w, w],
+		[w, w, f, w, w, w, w, f, f, f, f, w, w, w, w, w],
+		[w, w, f, f, w, w, w, f, f, f, f, w, w, w, w, w],
+		[w, w, w, f, w, w, w, f, f, f, f, w, w, w, w, w],
+		[w, f, f, f, w, w, w, f, f, f, f, w, w, w, w, w],
+		[w, f, w, w, w, w, w, f, f, f, f, f, w, f, f, w],
+		[w, f, w, w, w, w, w, f, f, f, f, f, f, f, f, x],
+		[w, f, f, f, f, f, f, f, f, f, e, f, f, f, f, x],
+		[w, w, w, w, w, w, w, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	const ROOM16 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, f, f, f, w, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, e, f, w, f, f, f, f, e, f, f, w, f, f, x],
+		[w, f, f, w, w, w, w, f, f, f, f, f, w, f, f, x],
+		[w, e, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, w, f, f, f, f, f, e, f, f, f, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, e, f, f, f, f, w],
+		[w, f, f, w, f, f, f, f, f, w, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, w, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, w, w, w, e, f, w, f, f, w],
+		[w, f, f, f, f, w, f, w, f, f, f, f, w, f, f, w],
+		[n, f, a, f, f, w, f, f, f, f, w, w, w, f, f, w],
+		[n, f, f, f, f, w, f, e, f, f, f, f, f, e, f, w],
+		[w, f, f, f, f, w, f, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	const ROOM17 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, w, w, w, f, f, f, f, w, w, w, f, f, w],
+		[w, f, f, w, e, f, f, f, f, f, f, e, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[n, f, f, f, f, f, f, w, w, f, f, f, f, f, f, x],
+		[n, f, f, f, f, f, f, w, w, f, f, f, f, f, f, x],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, e, f, f, f, f, f, f, e, w, f, f, w],
+		[w, f, f, w, w, w, f, f, f, f, w, w, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	const ROOM18 = [
+		[w, w, w, w, w, w, w, x, x, w, w, w, w, w, w, w],
+		[w, f, f, f, w, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, f, w, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, w, w, w, f, f, f, f, w, w, w, w, w, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, w, w, w],
+		[w, f, f, w, f, f, f, f, f, f, h, f, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, w, w, w],
+		[n, f, f, f, f, f, f, w, w, w, w, w, w, w, w, w],
+		[n, f, f, f, f, f, f, w, w, w, w, w, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, a, f, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, w, w, w],
+		[w, f, f, f, w, f, f, f, f, f, w, w, w, w, w, w],
+		[w, f, f, f, w, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, f, w, f, f, f, f, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	//Track 3 (Split (center) to end)
+	const ROOM19 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, e, f, f, f, f, f, f, f, f, f, f, w, f, e, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, w, w, w, w, w, f, f, w, f, f, w],
+		[w, f, f, f, e, f, f, f, f, w, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, w, f, f, w, f, f, w],
+		[w, w, w, w, w, w, w, f, f, w, e, f, f, f, f, w],
+		[n, f, f, w, f, f, w, f, f, w, f, f, f, f, f, x],
+		[n, f, f, w, f, f, w, f, f, w, f, f, f, f, f, x],
+		[w, f, f, w, f, f, w, f, f, w, w, w, w, f, f, w],
+		[w, f, f, f, f, f, f, e, f, f, f, f, w, f, f, w],
+		[w, e, f, f, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, w, w, w, w, w, w, w, w, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, w, f, e, w],
+		[w, e, f, f, f, f, f, f, f, f, f, f, w, f, e, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	const ROOM20 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, f, f, f, f, f, f, w, w, f, f, f, f, f, f, w],
+		[w, f, f, e, f, f, f, w, w, f, f, f, e, f, f, w],
+		[w, f, f, f, f, f, f, w, w, f, f, f, f, f, f, w],
+		[w, f, f, w, f, f, f, w, w, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, e, f, f, e, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[n, f, f, w, w, w, f, f, f, f, w, w, w, f, f, x],
+		[n, f, f, w, w, w, f, f, f, f, w, w, w, f, f, x],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, e, f, f, e, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, w, w, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, w, w, f, f, f, f, f, f, w],
+		[w, f, f, e, f, f, f, w, w, f, f, f, e, f, f, w],
+		[w, f, f, f, f, f, f, w, w, f, f, f, f, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w]
+	]
+	const ROOM21 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[n, f, f, f, f, f, f, w, w, f, f, f, f, f, f, x],
+		[n, f, f, f, f, f, f, w, w, f, f, f, f, f, f, x],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, f, f, w, f, f, f, f, f, f, f, f, w, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+	]
+	//Boss Room (4)
+	const ROOM22 = [
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+		[w, f, c, f, f, f, f, f, f, f, f, f, f, f, c, w],
+		[w, f, f, f, f, f, c, f, f, f, f, f, f, f, f, w],
+		[w, f, f, w, w, f, f, f, f, f, f, w, w, f, f, w],
+		[w, f, f, w, w, f, f, c, f, f, f, w, w, f, f, w],
+		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
+		[w, f, f, f, f, c, f, f, f, f, f, c, f, f, f, w],
+		[n, f, f, f, f, f, f, f, f, f, f, f, f, c, f, w],
+		[n, f, f, f, f, f, f, f, f, c, f, f, f, f, f, w],
+		[w, f, f, f, f, f, f, c, f, f, f, f, f, f, f, w],
+		[w, f, f, f, f, c, f, f, f, f, f, f, f, f, c, w],
+		[w, f, f, w, w, f, f, f, f, f, f, w, w, f, f, w],
+		[w, f, f, w, w, f, f, f, f, c, f, w, w, f, f, w],
+		[w, f, f, f, f, f, f, c, f, f, f, f, f, f, f, w],
+		[w, f, f, c, f, f, f, f, f, f, f, f, c, f, f, w],
+		[w, w, w, w, w, w, w, w, w, w, w, w, w, w, w, w],
+	]
+	//Track1
+	const mapArrayZero = [ROOM1, ROOM2, ROOM3, ROOM4, ROOM5, ROOM6, ROOM7, ROOM8];
+	//Track 2
+	const mapArrayOne = [ROOM9, ROOM10, ROOM11, ROOM12, ROOM13];
+	//Track 3
+	const mapArrayTwo = [ROOM14, ROOM15, ROOM16, ROOM17, ROOM18];
+	//Track 4
+	const mapArrayThree = [ROOM19, ROOM20, ROOM21];
+	//BossRoom 4
+	const mapArrayFour = [ROOM22];
+	const mapTracks = [mapArrayZero, mapArrayOne, mapArrayTwo, mapArrayThree, mapArrayFour];
 	let currentMap = 0;
+	let currentTrack = 0;
 
 	// Create a pool of sprite objects that can be re-used over and over again
 	const MAX_ENEMIES = 20; // increase or decrease as appropriate
@@ -338,16 +508,14 @@ var G = (function () {
 	/**
 	 * Draws the map on the board, clearing the screen before it does.
 	 */
-	const drawMap = function(map){
-		//paused = true; // pause the enemy timer
+	const drawMap = function(map, track){
 
 		clearScreen();
 
 		gameActive = true;
 
-		let m = mapArray[ map ]; // get map
-		//let i = 0; // index into map
-		//let j = 0;
+		PS.debug("Map: " + map + " Track: " + track + "\n");
+		let m = mapTracks[track][map]; // get map
 		for ( let row = 0; row < MAP_SIZE; row += 1 ) {
 			for ( let col = 0; col < MAP_SIZE; col += 1 ) {
 				let color;
@@ -392,6 +560,18 @@ var G = (function () {
 					PS.color(col, row, 0xf2f2f2);
 					PS.glyph(col, row, "@");
 					PS.data(col, row, "warp");
+				} else if(data === MAP_HEALTH) {
+					PS.color(col, row, 0xf2f2f2);
+					PS.glyph(col, row, '♡');
+					PS.data(col, row, "health");
+				} else if(data === MAP_ATTACK) {
+					PS.color(col, row, 0xf2f2f2);
+					PS.glyph(col, row, '⚚');
+					PS.data(col, row, "attack");
+				} else if(data = MAP_COIN){
+					PS.color(col, row, 0xf2f2f2);
+					PS.glyph(col, row, '$');
+					PS.data(col, row, "coin");
 				} else {
 					PS.debug( "Unknown item at " + col + ", " + row + " : "); // in case you make a mistake
 					PS.debug(data + "\n");
@@ -404,7 +584,7 @@ var G = (function () {
 	}
 
 	/**
-	 * Clears the screen to prepare for the next thing (screen or map) TODO make this into one function
+	 * Clears the screen to prepare for the next thing (screen or map)
 	 */
 	const clearScreen = function() {
 		PS.color( PS.ALL, PS.ALL, 0xEEEEEE );
@@ -473,15 +653,15 @@ var G = (function () {
 	} */
 
 	/**
-	 * Creates a win screen where you can shoot fireworks by pressing space.TODO make this into one function
+	 * Creates a win screen where you can shoot fireworks by pressing space.
 	 */
 	const endScreen = function(){
-		//PS.debug("End");
+		clearScreen();
 		gameActive = false;
+		paused = true;
 		drawVision(false);
 		PS.spriteShow( player, false ); // hide player sprite
 		PS.statusText("You Win!");
-		clearScreen();
 		PS.timerStop(timer);
 	}
 
@@ -521,15 +701,35 @@ var G = (function () {
 		if (data === "exit") {
 			currentMap += 1;
 			paused = true;
-			if (currentMap === mapArray.length) {
-				endScreen();
+			if (currentTrack === 0) {
+				if (currentMap === mapTracks[currentTrack].length) {
+					if (actor_y === 0) {
+						currentTrack = 1;
+						currentMap = 0;
+						drawMap(currentMap, currentTrack);
+					} else if (actor_x === 15) {
+						currentTrack = 3;
+						currentMap = 0;
+						drawMap(currentMap, currentTrack);
+					} else if (actor_y === 15) {
+						currentTrack = 2;
+						currentMap = 0;
+						drawMap(currentMap, currentTrack);
+					}
+				} else {
+					drawMap(currentMap, currentTrack);
+				}
+			} else if((currentTrack > 0) && currentMap === mapTracks[currentTrack].length){
+				PS.debug("Map: " + currentMap + " Track: " + currentTrack + "\n");
+				currentTrack = 4;
+				currentMap = 0;
+				drawMap(currentMap, currentTrack);
 			} else {
-				drawMap(currentMap);
-				PS.debug("Paused status is " + paused + "\n");
+				drawMap(currentMap, currentTrack);
 			}
 			return;
 		}
-
+		//Found a warp spot
 		if(data === "warp"){
 			PS.data(actor_x, actor_y, PS.DEFAULT);
 			for(let col = 0; col < MAP_SIZE; col++){
@@ -545,12 +745,32 @@ var G = (function () {
 				}
 			}
 		}
+		//Found a health Powerup
+		if(data === "health"){
+			PS.data(actor_x, actor_y, PS.DEFAULT);
+			incrementLives(1);
+			PS.audioPlay("fx_powerup8");
 
+		}
+		//Found an attack powerup
+		if(data === "attack"){
+			PS.data(actor_x, actor_y, PS.DEFAULT);
+			ATTACK_RANGE = 2;
+			PS.audioPlay("fx_powerup8");
+			let attackUp = PS.timerStart(360, function(){
+				PS.timerStop(attackUp);
+				ATTACK_RANGE = 1;
+			});
+		}
+		//Reached the end and collected a coin
+		if(data === "coin"){
+			PS.data(actor_x, actor_y, PS.DEFAULT);
+			endScreen();
+		}
 		//Turn the vision on as soon as they move, and with every movement after.
 		drawVision(true);
 
 		// Make all active sprites chase player
-
 		for (let i = 0; i < e_count; i += 1) {
 			let e = enemies[i];
 			if (PS.spriteShow(e.sprite)) {
@@ -561,6 +781,7 @@ var G = (function () {
 				}
 			}
 		}
+
 	}
 
 	/**
@@ -568,7 +789,12 @@ var G = (function () {
 	 * @param value
 	 */
 	const incrementLives = function(value){
-		lives = lives + value;
+		if((lives + value) > 4){
+			PS.audioPlay("fx_shoot8");
+			return;
+		} else {
+			lives = lives + value;
+		}
 		let lifeDisplay = [];
 		for(let i = 0; i < lives; i++){
 			lifeDisplay.push('♡️');
@@ -587,12 +813,19 @@ var G = (function () {
 	 */
 	const loseScreen = function(){
 		gameActive = false;
+		paused = true;
+		drawVision(false);
+		drawMap(currentMap, currentTrack);
+		incrementLives(3);
+
+
+		/*gameActive = false;
 		PS.spriteShow( player, false ); // hide player
 		clearScreen(); // hides all enemies
 		PS.color( PS.ALL, PS.ALL, PS.COLOR_BLACK );
 		PS.statusColor( 0xD5D5D5 );
 		PS.statusText( "Game Over!" );
-		PS.timerStop(timer);
+		PS.timerStop(timer); */
 	}
 
 	/**
@@ -645,7 +878,6 @@ var G = (function () {
 	 * Moves the enemies on a timer
 	 */
 	const _clock = function () {
-		PS.debug("Paused status is " + paused + "\n");
 
 		if ( paused ) {
 			return;
@@ -707,24 +939,34 @@ var G = (function () {
 				//PS.debug("Moved enemy " + i);
 			}
 		}
+
 	};
 
 	/**
 	 * Eliminates any enemies surrounding the player (doesn't work)
 	 */
-	const eliminate = function(){
-		for ( let y = actor_y - 1; y < ( actor_y + 2 ); y += 1 ) {
-			for ( let x = actor_x - 1; x < ( actor_x + 2 ); x += 1 ) {
-				// Only check locations on the map
-				if ( ( x >= 0 ) && ( x < MAP_SIZE ) && ( y >= 0 ) && ( y < MAP_SIZE ) ) {
-					// Don't check if location is a wall
-					if ( PS.data( x, y ) !== "wall" ) {
-						// Look for visible sprites at this location
-						for ( let i = 0; i < e_count; i += 1 ) {
-							let e = enemies[ i ];
-							if ( PS.spriteShow( e.sprite ) && ( e.x === x ) && ( e.y === y ) ) {
-								PS.spriteShow( e.sprite, false ); // hide sprite; dead!
-								PS.audioPlay("fx_bang");
+	const eliminate = function() {
+		if (deactivate) {
+			return
+		} else {
+			for (let y = actor_y - ATTACK_RANGE; y < (actor_y + ATTACK_RANGE + 1); y += 1) {
+				for (let x = actor_x - ATTACK_RANGE; x < (actor_x + ATTACK_RANGE + 1); x += 1) {
+					// Only check locations on the map
+					if ((x >= 0) && (x < MAP_SIZE) && (y >= 0) && (y < MAP_SIZE)) {
+						// Don't check if location is a wall
+						if (PS.data(x, y) !== "wall") {
+							// Look for visible sprites at this location
+							for (let i = 0; i < e_count; i += 1) {
+								let e = enemies[i];
+								if (PS.spriteShow(e.sprite) && (e.x === x) && (e.y === y)) {
+									PS.spriteShow(e.sprite, false); // hide sprite; dead!
+									PS.audioPlay("fx_bang");
+									deactivate = true;
+									let cooldown = PS.timerStart(40, function(){
+										PS.timerStop(cooldown);
+										deactivate = false;
+									});
+								}
 							}
 						}
 					}
@@ -741,7 +983,7 @@ var G = (function () {
 	 * @param p2
 	 * @param type
 	 */
-	var damage = function(s1, p1, s2, p2, type){
+	const damage = function(s1, p1, s2, p2, type){
 		//PS.debug("Called increment from collision; ");
 		if(type === PS.SPRITE_OVERLAP) {
 			incrementLives(-1);
@@ -751,7 +993,7 @@ var G = (function () {
 
 	// BREAK BETWEEN FUNCTIONS AND EXPORTS
 
-	var exports = {
+	const exports = {
 
 		/**
 		 * Initializes the game with grid size, status, and start screen
@@ -771,7 +1013,10 @@ var G = (function () {
 
 			PS.audioLoad("fx_scratch");
 			PS.audioLoad("fx_bang");
-			PS.audioLoad("fx_powerup4")
+			PS.audioLoad("fx_powerup4");
+			PS.audioLoad("fx_shoot8");
+			PS.audioLoad("fx_powerup8");
+
 
 			// *BM* set up player sprite only once!
 
@@ -795,7 +1040,7 @@ var G = (function () {
 				} );
 			}
 
-			drawMap(currentMap);
+			drawMap(currentMap, currentTrack);
 
 			timer = PS.timerStart( 45, _clock ); // start the timer
 
@@ -864,93 +1109,9 @@ var G = (function () {
 	return exports;
 } () );
 
+PS.init = G.init;
 
-
-/*
-PS.init( system, options )
-Called once after engine is initialized but before event-polling begins.
-This function doesn't have to do anything, although initializing the grid dimensions with PS.gridSize() is recommended.
-If PS.grid() is not called, the default grid dimensions (8 x 8 beads) are applied.
-Any value returned is ignored.
-[system : Object] = A JavaScript object containing engine and host platform information properties; see API documentation for details.
-[options : Object] = A JavaScript object with optional data properties; see API documentation for details.
-*/
-
-PS.init = G.init; /*function( system, options ) {
-
-
-	PS.gridSize( 16, 16 );
-
-	PS.statusText( "Game" );
-
-	// Add any other initialization code you need here.
-
-	// Change this TEAM constant to your team name,
-	// using ONLY alphabetic characters (a-z).
-	// No numbers, spaces, punctuation or special characters!
-
-	const TEAM = "TeamDomino";
-
-	// This code should be the last thing
-	// called by your PS.init() handler.
-	// DO NOT MODIFY IT, except for the change
-	// explained in the comment below.
-
-	PS.dbLogin( "imgd2900", TEAM, function ( id, user ) {
-		if ( user === PS.ERROR ) {
-			return;
-		}
-		PS.dbEvent( TEAM, "startup", user );
-		PS.dbSend( TEAM, PS.CURRENT, { discard : true } );
-	}, { active : false } );
-	
-	// Change the false in the final line above to true
-	// before deploying the code to your Web site.
-}; */
-
-/*
-PS.keyDown ( key, shift, ctrl, options )
-Called when a key on the keyboard is pressed.
-This function doesn't have to do anything. Any value returned is ignored.
-[key : Number] = ASCII code of the released key, or one of the PS.KEY_* constants documented in the API.
-[shift : Boolean] = true if shift key is held down, else false.
-[ctrl : Boolean] = true if control key is held down, else false.
-[options : Object] = A JavaScript object with optional data properties; see API documentation for details.
-*/
-
-PS.keyDown = G.keyDown; /*function( key, shift, ctrl, options ) {
-	// Uncomment the following code line to inspect first three parameters:
-
-	// PS.debug( "PS.keyDown(): key=" + key + ", shift=" + shift + ", ctrl=" + ctrl + "\n" );
-
-	// Add code here for when a key is pressed.
-}; */
-
-/*
-PS.keyUp ( key, shift, ctrl, options )
-Called when a key on the keyboard is released.
-This function doesn't have to do anything. Any value returned is ignored.
-[key : Number] = ASCII code of the released key, or one of the PS.KEY_* constants documented in the API.
-[shift : Boolean] = true if shift key is held down, else false.
-[ctrl : Boolean] = true if control key is held down, else false.
-[options : Object] = A JavaScript object with optional data properties; see API documentation for details.
-*/
-
-PS.keyUp = function( key, shift, ctrl, options ) {
-	// Uncomment the following code line to inspect first three parameters:
-
-	// PS.debug( "PS.keyUp(): key=" + key + ", shift=" + shift + ", ctrl=" + ctrl + "\n" );
-
-	// Add code here for when a key is released.
-};
-
-/*
-PS.shutdown ( options )
-Called when the browser window running Perlenspiel is about to close.
-This function doesn't have to do anything. Any value returned is ignored.
-[options : Object] = A JavaScript object with optional data properties; see API documentation for details.
-NOTE: This event is generally needed only by applications utilizing networked telemetry.
-*/
+PS.keyDown = G.keyDown;
 
 PS.shutdown = function( options ) {
 	// Uncomment the following code line to verify operation:
