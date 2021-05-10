@@ -720,7 +720,7 @@ var G = (function () {
 					drawMap(currentMap, currentTrack);
 				}
 			} else if((currentTrack > 0) && currentMap === mapTracks[currentTrack].length){
-				PS.debug("Map: " + currentMap + " Track: " + currentTrack + "\n");
+				//PS.debug("Map: " + currentMap + " Track: " + currentTrack + "\n");
 				currentTrack = 4;
 				currentMap = 0;
 				drawMap(currentMap, currentTrack);
