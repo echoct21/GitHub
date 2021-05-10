@@ -303,7 +303,7 @@ var G = (function () {
 		[w, f, f, f, f, f, f, f, f, f, f, f, f, f, f, w],
 		[w, f, f, w, w, w, f, f, f, f, w, w, w, w, w, w],
 		[w, f, f, f, e, f, f, f, f, f, f, e, w, w, w, w],
-		[w, f, f, f, f, f, f, f, f, f, a, f, w, w, w, w],
+		[w, f, f, f, f, f, f, f, f, f, h, f, w, w, w, w],
 		[w, f, f, f, f, f, f, f, f, f, f, f, w, w, w, w],
 		[n, f, f, f, f, f, f, w, w, w, w, w, w, w, w, w],
 		[n, f, f, f, f, f, f, w, w, w, w, w, w, w, w, w],
@@ -514,7 +514,6 @@ var G = (function () {
 
 		gameActive = true;
 
-		PS.debug("Map: " + map + " Track: " + track + "\n");
 		let m = mapTracks[track][map]; // get map
 		for ( let row = 0; row < MAP_SIZE; row += 1 ) {
 			for ( let col = 0; col < MAP_SIZE; col += 1 ) {
@@ -591,6 +590,7 @@ var G = (function () {
 		PS.border( PS.ALL, PS.ALL, 0 );
 		PS.glyph( PS.ALL, PS.ALL, 0 );
 		PS.data( PS.ALL, PS.ALL, 0 );
+		drawVision(false);
 		// Reset all active enemies
 		for ( let i = 0; i < enemies.length; i += 1 ) {
 			//PS.debug("E-count: " + e_count + " length: " + enemies.length);
@@ -606,53 +606,6 @@ var G = (function () {
 	};
 
 	/**
-	 * Places the enemies on the map.          REMOVED
-	 */
-	/*var placeChars = function(){
-		var row, col, data;
-		for(let i = 0; i < enemies.length; i++){
-			PS.spriteDelete(enemies[i].e);
-		}
-		//May have fixed the loading bug here
-		enemies = [];
-		PS.debug("enemies is empty" + enemies);
-		for (row = 0; row <  MAP_SIZE; row++) {
-			for (col = 0; col < MAP_SIZE; col++) {
-				data = PS.data(col, row);
-				if(data === "enemy"){
-					//PS.debug(data)
-					var enemy = PS.spriteSolid(1, 1);
-					PS.spriteMove(enemy, col, row);
-					PS.spritePlane(enemy, 1);
-					//PS.color(col, row, PS.COLOR_BLACK);
-					//PS.alpha(col, row, PS.ALPHA_OPAQUE);
-					//PS.data(col, row, "enemy");
-					//PS.debug(enemies);
-					var enemyO = {e : enemy, line : null , step : null};
-					enemies.push(enemyO);
-					PS.data(col, row, PS.DEFAULT);
-				}
-			}
-		}
-		for (row = 0; row < MAP_SIZE; row++) {
-			if(PS.data(0, row) === "enter"){
-				PS.color(0, row, 0xEEEEEE);
-				//PS.data(0, row, "player");
-				//PS.alpha(0, row, PS.ALPHA_OPAQUE);
-				player = PS.spriteSolid(1, 1);
-				PS.spriteMove(player, 0, row);
-				PS.spriteSolidColor(player, PS.COLOR_WHITE);
-				PS.spritePlane(player, 1);
-				PS.spriteCollide(player, damage);
-				//playerX = 0;
-				//playerY = row;
-				//PS.debug("player" + playerX + " " + playerY + "\n")
-				break;
-			}
-		}
-	} */
-
-	/**
 	 * Creates a win screen where you can shoot fireworks by pressing space.
 	 */
 	const endScreen = function(){
@@ -662,6 +615,7 @@ var G = (function () {
 		drawVision(false);
 		PS.spriteShow( player, false ); // hide player sprite
 		PS.statusText("You Win!");
+		PS.audioPlay("perc_triangle");
 		PS.timerStop(timer);
 	}
 
@@ -750,6 +704,8 @@ var G = (function () {
 			PS.data(actor_x, actor_y, PS.DEFAULT);
 			incrementLives(1);
 			PS.audioPlay("fx_powerup8");
+			PS.glyph(actor_x, actor_y, PS.DEFAULT);
+			PS.color(actor_x, actor_y, 0xBBBBBB)
 
 		}
 		//Found an attack powerup
@@ -757,6 +713,8 @@ var G = (function () {
 			PS.data(actor_x, actor_y, PS.DEFAULT);
 			ATTACK_RANGE = 2;
 			PS.audioPlay("fx_powerup8");
+			PS.glyph(actor_x, actor_y, PS.DEFAULT);
+			PS.color(actor_x, actor_y, 0xBBBBBB)
 			let attackUp = PS.timerStart(360, function(){
 				PS.timerStop(attackUp);
 				ATTACK_RANGE = 1;
@@ -766,6 +724,7 @@ var G = (function () {
 		if(data === "coin"){
 			PS.data(actor_x, actor_y, PS.DEFAULT);
 			endScreen();
+			return;
 		}
 		//Turn the vision on as soon as they move, and with every movement after.
 		drawVision(true);
@@ -1016,6 +975,7 @@ var G = (function () {
 			PS.audioLoad("fx_powerup4");
 			PS.audioLoad("fx_shoot8");
 			PS.audioLoad("fx_powerup8");
+			PS.audioLoad("perc_triangle");
 
 
 			// *BM* set up player sprite only once!
