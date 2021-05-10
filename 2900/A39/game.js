@@ -512,8 +512,6 @@ var G = (function () {
 
 		clearScreen();
 
-		gameActive = true;
-
 		let m = mapTracks[track][map]; // get map
 		for ( let row = 0; row < MAP_SIZE; row += 1 ) {
 			for ( let col = 0; col < MAP_SIZE; col += 1 ) {
@@ -580,6 +578,12 @@ var G = (function () {
 			//i++;
 		}
 		drawVision(false);
+		let visionTimer = PS.timerStart(35, function(){
+			PS.timerStop(visionTimer);
+			//PS.debug(gameActive + "\n");
+			gameActive = true;
+			//PS.debug(gameActive + "\n");
+		});
 	}
 
 	/**
@@ -625,9 +629,10 @@ var G = (function () {
 	 * @param y
 	 */
 	const move = function(x, y) {
-		paused = false; // restart the timer
+
 		if(!gameActive)
 			return;
+		paused = false;// restart the timer
 
 
 		let nx = actor_x + x;
@@ -681,6 +686,7 @@ var G = (function () {
 			} else {
 				drawMap(currentMap, currentTrack);
 			}
+			gameActive = false;
 			return;
 		}
 		//Found a warp spot
@@ -768,7 +774,7 @@ var G = (function () {
 	}
 
 	/**
-	 * Displays the lose screen TODO make this into one function
+	 * Displays the lose screen
 	 */
 	const loseScreen = function(){
 		gameActive = false;
@@ -776,15 +782,6 @@ var G = (function () {
 		drawVision(false);
 		drawMap(currentMap, currentTrack);
 		incrementLives(3);
-
-
-		/*gameActive = false;
-		PS.spriteShow( player, false ); // hide player
-		clearScreen(); // hides all enemies
-		PS.color( PS.ALL, PS.ALL, PS.COLOR_BLACK );
-		PS.statusColor( 0xD5D5D5 );
-		PS.statusText( "Game Over!" );
-		PS.timerStop(timer); */
 	}
 
 	/**
