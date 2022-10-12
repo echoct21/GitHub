@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PlaceholderPageName</title>
+    <style>
+        body { margin: 2em; font-family: sans-serif; }
+        h1 { color: DodgerBlue; }
+		.header-image{background-size:cover}
+		.header-image{height:300px}
+    </style>
+	
+	<style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style>
+
+    <style>  
+    html {margin:0} html body {margin:0}
+
+    /* Background image: 1674 x 595; 1/2 = 837 */
+    .header {
+    position: relative; 
+    overflow: hidden;
+    width: 100%;
+    height: 300px;
+    }
+
+    img.bg {
+    /* Set rules to fill background */
+    min-height: 100%;
+    min-width: 1674px;
+    
+    /* Set up proportionate scaling */
+    width: 100%;
+    height: auto;
+    
+    /* Set up positioning */
+    position: absolute;
+    top: 0;
+    left: 0;
+    }
+
+    .entry-content {
+    margin-left: 50px;
+    margin-right: 50px;
+    }
+
+    /* This is what makes it go weird on screen widths, or maybe not*/
+    @media screen and (max-width: 1674px) {
+      img.bg {
+        left: 50%;
+        margin-left: -837px; /* 50% */
+      }
+    }
+
+    img.site-logo {
+    position:absolute;
+    left: 50px;
+    top: 20px;
+    max-height: 100px;
+    }
+
+  /*  div{border-style:solid;border-color:red} */
+    </style>
+	
+</head>
+	
+<!-- End of CSS defs, start of page -->
+	
+	<!-- Header image -->
+<body>
+	<div class="header">
+		<img class="bg" src="./images/OceanCastle.png" width="1674" alt="">
+		<img class="site-logo" src="./images/OwenL_EchoLogo_V03.png" alt="">	 
+	</div>
+	
+	<!-- Set up centered text for page opening -->
+	<div id="content" class="page-wrap">
+		<div class="container content-wrapper">
+			<div class="row">	
+	<div id="primary" class="fp-content-area">
+		<main id="main" class="site-main" role="main">
+			<div class="entry-content">
+									<p><br></p>
+				
+<!-- TEXT GOES HERE -->
+<p> Hi, it me, I do things sometimes. This text just needs to fill enough space to make a difference. Hwat, wae gardaena, in geardagum, theodcunina, thrym ge frunon, hy tha aethelingas, ellen fremedon. Oft Scyld Scyfeing, sceatheana theatrum, monegum magthum, meoda setla oftea, egsode eorle, sythan earest wearth, feasceaft funden, he thas frofre gebad, weox under wylcnum, weorth myndum tha, uythat hm aegwylk, thara ym sittendra, ofer hron rade, hyran scolde, gomban gyldan, that was god cyning.</p>				
+				
+<!-- TEXT STOPS HERE -->
+			
+<!-- these shoudl be moved to a sidebar somehow-->
+    <h2>Links</h2>
+    <p><a href="2900/index.html"><strong>IMGD-2900: Digital Game Design I</strong></a></p>
+    <p></p>
+    <p><a href="1002/index.html"><strong>IMGD-1002: Storytelling in Interactive Media and Games</strong></a></p>
+	 <p></p>
+    <p><a href="3400/index.html"><strong>IMGD-3400: Writing Narritives for Interactive Media and Games</strong></a></p>
+				
+			</div> <!-- entry content end -->
+		</main> 
+	</div> <!-- primary -->
+			</div> <!-- Row -->
+		</div> <!-- container -->
+	</div> <!-- content -->
+	
+</body>
+</html>
