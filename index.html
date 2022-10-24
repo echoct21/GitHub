@@ -5,7 +5,7 @@
     <title>PlaceholderPageName</title>
     <style>
         body { margin: 2em; font-family: sans-serif; }
-        h1 { color: DodgerBlue; }
+        h1 { color: #000000; font: Baskerville, "Palatino Linotype", Palatino, "Century Schoolbook L", "Times New Roman", "serif"; font-size: 18pt; margin-left: 12px; margin-right: 12px}
 		.header-image{background-size:cover}
 		.header-image{height:300px}
     </style>
@@ -39,7 +39,7 @@
     }
 
     .entry-content {
-    margin-left: 50px;
+    margin-left: 200px;
     margin-right: 50px;
     }
 
@@ -57,6 +57,51 @@
     top: 20px;
     max-height: 100px;
     }
+		
+	img.text {
+	float:left;
+	margin:5px;
+	}
+		
+	/* The sidebar menu */
+	.sidenav {
+	  height: 100%; /* Full-height: remove this if you want "auto" height */
+	  width: 160px; /* Set the width of the sidebar */
+	  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+	  z-index: 1; /* Stay on top */
+	  top: 300px; /* Stay under the image */
+	  left: 0;
+	  background-color: #66748a; /* Black */
+	  overflow-x: hidden; /* Disable horizontal scroll */
+	  padding-top: 20px;
+	  right: 0;
+	}
+
+	/* The navigation menu links */
+	.sidenav a {
+	  padding: 6px 8px 6px 16px;
+	  text-decoration: none;
+	  font-size: 25px;
+	  color: #000000;
+	  display: block;
+	}
+
+	/* When you mouse over the navigation links, change their color */
+	.sidenav a:hover {
+	  color: #f1f1f1;
+	}
+
+	/* Style page content */
+	.main {
+	  margin-left: 160px; /* Same as the width of the sidebar */
+	  padding: 0px 10px;
+	}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
 
   /*  div{border-style:solid;border-color:red} */
     </style>
@@ -72,6 +117,18 @@
 		<img class="site-logo" src="./images/OwenL_EchoLogo_V03.png" alt="">	 
 	</div>
 	
+	<!-- Side navigation -->
+<div class="sidenav">
+  <h1>Class Links</h1>
+  <a href="1002/index.html">IMGD 1002</a>
+  <a href="2400/index.html">IMGD 2400</a>
+  <a href="3400/index.html">IMGD 3400</a>
+  <a href="2700/index.html">IMGD 2700</a>
+  <a href="2900/index.html">IMGD 2900</a>
+</div>
+
+<!-- Page content -->
+	
 	<!-- Set up centered text for page opening -->
 	<div id="content" class="page-wrap"> <!-- content -->
 		<div class="container content-wrapper">  <!-- container -->
@@ -79,22 +136,17 @@
 	<div id="primary" class="fp-content-area"> <!-- primary -->
 		<main id="main" class="site-main" role="main">
 			<div class="entry-content">
-									<p><br></p>
+									
 				
 <!-- TEXT GOES HERE -->
 <p> Hi, it me, I do things sometimes. This text just needs to fill enough space to make a difference. Hwat, wae gardaena, in geardagum, theodcunina, thrym ge frunon, hy tha aethelingas, ellen fremedon. Oft Scyld Scefing, sceatheana theatrum, monegum magthum, meoda setla oftea, egsode eorle, sythan earest wearth, feasceaft funden, he thas frofre gebad, weox under wylcnum, weorth myndum tha, uythat hm aegwylk, thara ym sittendra, ofer hron rade, hyran scolde, gomban gyldan, that was god cyning.</p>				
 				
 <!-- TEXT STOPS HERE -->
-			
-<!-- these should be moved to a sidebar somehow-->
-    <h2>Links</h2>
-    <p><a href="2900/index.html"><strong>IMGD-2900: Digital Game Design I</strong></a></p>
-    <p></p>
-    <p><a href="1002/index.html"><strong>IMGD-1002: Storytelling in Interactive Media and Games</strong></a></p>
-	<p><a href="2400/index.html"><strong>IMGD-2400: Writing Characters for Interactive Media and Games</strong></a></p>
-    <p><a href="3400/index.html"><strong>IMGD-3400: Writing Narritives for Interactive Media and Games</strong></a></p>
-	<p><a href="2700/index.html"><strong>IMGD-2700: Digital Painting</strong></a></p>
-				
+	
+<div>
+<img class="text" src="./images/HousePainting.png" width="500px" alt="">
+</div>
+		
 			</div> <!-- entry content end -->
 		</main> 
 	</div> <!-- primary -->
