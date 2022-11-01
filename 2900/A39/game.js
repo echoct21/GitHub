@@ -1007,13 +1007,13 @@ var G = (function () {
 			// called by your PS.init() handler.
 			// DO NOT MODIFY IT, except for the change
 			// explained in the comment below.
-			PS.dbLogin("imgd2900", TEAM, function (id, user) {
+			/*PS.dbLogin("imgd2900", TEAM, function (id, user) {
 				if (user === PS.ERROR) {
 					return;
 				}
 				PS.dbEvent(TEAM, "startup", user);
 				PS.dbSend(TEAM, PS.CURRENT, {discard: true});
-			}, {active: false});
+			}, {active: false}); */
 			// Change the false in the final line above to true
 			// before deploying the code to your Web site.
 		},

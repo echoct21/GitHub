@@ -92,13 +92,13 @@ PS.init = function( system, options ) {
 	// DO NOT MODIFY THIS FUNCTION CALL
 	// except as instructed
 
-	PS.dbLogin( "imgd2900", TEAM, function ( id, user ) {
+	/*PS.dbLogin( "imgd2900", TEAM, function ( id, user ) {
 		if ( user === PS.ERROR ) {
 			return;
 		}
 		PS.dbEvent( TEAM, "startup", user );
 		PS.dbSend( TEAM, PS.CURRENT, { discard : true } );
-	}, { active : true } );
+	}, { active : true } );*/
 };
 
 /*
