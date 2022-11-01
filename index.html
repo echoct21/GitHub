@@ -1,196 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <title>PlaceholderPageName</title>
     <style>
-        body { margin: 2em; font-family: sans-serif; }
-        h1 { color: #000000; font: Baskerville, "Palatino Linotype", Palatino, "Century Schoolbook L", "Times New Roman", "serif"; font-size: 18pt; margin-left: 12px; margin-right: 12px}
-		.header-image{background-size:cover}
-		.header-image{height:300px}
-    </style>
-	
-	<style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style>
 
-    <style>  
-    html {margin:0} html body {margin:0}
-
-    /* Background image: 1674 x 595; 1/2 = 837 */
-    .header {
-    position: relative; 
-    overflow: hidden;
-    width: 100%;
-    height: 300px;
-    }
-
-    img.bg {
-    /* Set rules to fill background */
-    min-height: 100%;
-    min-width: 1674px;
-    
-    /* Set up proportionate scaling */
-    width: 100%;
-    height: auto;
-    
-    /* Set up positioning */
-    position: absolute;
-    top: 0;
-    left: 0;
-    }
-
-    .entry-content {
-    margin-left: 200px;
-    margin-right: 50px;
-    }
-
-    /* This is what makes it go weird on screen widths, or maybe not*/
-    @media screen and (max-width: 1674px) {
-      img.bg {
-        left: 50%;
-        margin-left: -837px; /* 50% */
+      .HolyGrail {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
       }
-    }
 
-    img.site-logo {
-    position:absolute;
-    left: 50px;
-    top: 20px;
-    max-height: 100px;
-    }
+      .HolyGrail-body {
+      display: flex;
+      flex: 1;
+      }
+
+      .HolyGrail-content {
+      flex: 1;
+      }
+
+      .img-in-txt {
+      float: left;
+
+      }
+
+      .HolyGrail-nav, .HolyGrail-ads {
+      /* 12em is the width of the columns */
+      flex: 0 0 12em;
+      }
+
+      .HolyGrail-nav {
+      /* put the nav on the left */
+      order: -1;
+      }
+
+		.bg {
+			background: url("./images/ToussaintTownDetail.png");
+			background-position: center top;
+			height:360px;
+			width: 100%;
+		}
 		
-	img.text {
-	float:left;
-	align:left;
-	margin:5px;
-	}
-		
-	/* The sidebar menu */
-	.sidenav {
-	  height: 100%; /* Full-height: remove this if you want "auto" height */
-	  width: 160px; /* Set the width of the sidebar */
-	  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-	  z-index: 1; /* Stay on top */
-	  top: 300px; /* Stay under the image */
-	  left: 0;
-	  background-color: #66748a; /* Black */
-	  overflow-x: hidden; /* Disable horizontal scroll */
-	  padding-top: 20px;
-	  right: 0;
-	}
+		.logo {
+			height: 180px;
+		}
 
-	/* The navigation menu links */
-	.sidenav a {
-	  padding: 6px 8px 6px 16px;
-	  text-decoration: none;
-	  font-size: 25px;
-	  color: #000000;
-	  display: block;
-	}
-
-	/* When you mouse over the navigation links, change their color */
-	.sidenav a:hover {
-	  color: #f1f1f1;
-	}
-
-	/* Style page content */
-	.main {
-	  margin-left: 160px; /* Same as the width of the sidebar */
-	  padding: 0px 10px;
-	}
-
-/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
-}
-
-  /*  div{border-style:solid;border-color:red} */
     </style>
-	
-</head>
-	
+  </head>
+
 <!-- End of CSS defs, start of page -->
-	
-	<!-- Header image -->
-<body>
-	<div class="header">
-		<img class="bg" src="./images/OceanCastle.png" width="1674" alt="">
-		<img class="site-logo" src="./images/OwenL_EchoLogo_V03.png" alt="">	 
-	</div>
-	
-	<!-- Side navigation -->
-<div class="sidenav">
-  <h1>Class Links</h1>
-  <a href="1002/index.html">IMGD 1002</a>
-  <a href="2400/index.html">IMGD 2400</a>
-  <a href="3400/index.html">IMGD 3400</a>
-  <a href="2700/index.html">IMGD 2700</a>
-  <a href="2900/index.html">IMGD 2900</a>
-</div>
 
-<!-- Page content -->
-	
-	<!-- Set up centered text for page opening -->
-	<div id="content" class="page-wrap"> <!-- content -->
-		<div class="container content-wrapper">  <!-- container -->
-			<div class="row">	 <!-- Row -->
-	<div id="primary" class="fp-content-area"> <!-- primary -->
-		<main id="main" class="site-main" role="main">
-			<div class="entry-content">
-									
-				
-<!-- TEXT GOES HERE -->
-<p> Kalak rounded a rocky stone ridge and stumbled to a stop before the body of a dying thunderclast. The enormous stone beast lay on its side, riblike protrusions from its chest broken and cracked. The monstrosity was vaguely skeletal in shape, with unnaturally long limbs that sprouted from granite shoulders. The eyes were deep red spots on the arrowhead face, as if created by a fire burning deep within the stone. They faded.</p>
+  <body class="HolyGrail">
+    <header>
+      	<div class="bg">
+      <img class="logo" src="./images/OwenL_EchoLogo_V03.png" alt="">
+      </div>
+    </header>
 
-<p>Even after all these centuries, seeing a thunderclast up close made Kalak shiver. The beast’s hand was as long as a man was tall. He’d been killed by hands like those before, and it hadn’t been pleasant.</p>
+    <div class="HolyGrail-body">
+      <main class="HolyGrail-content">
+        <p> Hi! My name is Owen Lacey, and I'm an IMGD and Professional
+        Writing double major at Worcester Polytechnic Institute. This site
+        is a collection of the art, games, and other things I've made for
+        classes, or on my own. </p>
+
+        <p>Class projects are labelled on the left with their class number,
+        and each page has a short description of the class. Other works are
+        collected under named links beneath the classes.</p>
 
 	<img class="text" src="./images/HousePainting.png" width="500px" alt="">
-<p>Of course, dying rarely was.</p>
 
-<p>He rounded the creature, picking his way more carefully across the battlefield. The plain was a place of misshapen rock and stone, natural pillars rising around him, bodies littering the ground. Few plants lived here.</p>
+        <p>This is a digital painting from IMGD 2700. The subject is a
+          building from The Witcher 3, Corvo Bianco Manor.</p>
 
-<p>The stone ridges and mounds bore numerous scars. Some were shattered, blasted-out sections where Surgebinders had fought. Less frequently, he passed cracked, oddly shaped hollows where thunderclasts had ripped themselves free of the stone to join the fray.</p>
+        <p>This site is still a work in progress, but it contains all of
+        the important works that I have.</p>
 
-<p>Many of the bodies around him were human; many were not. Blood mixed. Red. Orange. Violet. Though none of the bodies around him stirred, an indistinct haze of sounds hung in the air. Moans of pain, cries of grief. They did not seem like the sounds of victory. Smoke curled from the occasional patches of growth or heaps of burning corpses. Even some sections of rock smoldered. The Dustbringers had done their work well.</p>
+      </main>
 
-<p>But I survived, Kalak thought, hand to breast as he hastened to the meeting place. I actually survived this time.</p>
+      <nav class="HolyGrail-nav">
+        <h1>Class Links</h1>
+        <ul>
+          <li><a href="1002/index.html">IMGD 1002</a></li>
+          <li><a href="2400/index.html">IMGD 2400</a></li>
+          <li><a href="3400/index.html">IMGD 3400</a></li>
+          <li><a href="2700/index.html">IMGD 2700</a></li>
+          <li><a href="2900/index.html">IMGD 2900</a></li>
+        </ul>
+      </nav>
 
-That was dangerous. When he died, he was sent back, no choice. When he survived the Desolation, he was supposed to go back as well. Back to that place that he dreaded. Back to that place of pain and fire. What if he just decided . . . not to go?
+    </div>
 
-Perilous thoughts, perhaps traitorous thoughts. He hastened on his way.
-
-The place of meeting was in the shadow of a large rock formation, a spire rising into the sky. As always, the ten of them had decided upon it before the battle. The survivors would make their way here. Oddly, only one of the others was waiting for him. Jezrien. Had the other eight all died? It was possible. The battle had been so furious this time, one of the worst. The enemy was growing increasingly tenacious.
-
-But no. Kalak frowned as he stepped up to the base of the spire. Seven magnificent swords stood proudly here, driven point-first into the stone ground. Each was a masterly work of art, flowing in design, inscribed with glyphs and patterns. He recognized each one. If their masters had died, the Blades would have vanished.
-
-These Blades were weapons of power beyond even Shardblades. These were unique. Precious. Jezrien stood outside the ring of swords, looking eastward.
-
-“Jezrien?”
-
-The figure in white and blue glanced toward him. Even after all these centuries, Jezrien looked young, like a man barely into his thirtieth year. His short black beard was neatly trimmed, though his once-fine clothing was scorched and stained with blood. He folded his arms behind his back as he turned to Kalak.
-
-“What is this, Jezrien?” Kalak asked. “Where are the others?”
-
-“Departed.” Jezrien’s voice was calm, deep, regal. Though he hadn’t worn a crown in centuries, his royal manner lingered. He always seemed to know what to do. “You might call it a miracle. Only one of us died this time.”
-
-“Talenel,” Kalak said. His was the only Blade unaccounted for.
-
-“Yes. He died holding that passage by the northern waterway.”
-
-Kalak nodded. Taln had a tendency to choose seemingly hopeless fights and win them. He also had a tendency to die in the process. He would be back now, in the place where they went between Desolations. The place of nightmares.
-
-Kalak found himself shaking. When had he become so weak? “Jezrien, I can’t return this time.” Kalak whispered the words, stepping up and gripping the other man’s arm. “I can’t.”.</p>				
-				
-<!-- TEXT STOPS HERE -->
-
-
-		
-			</div> <!-- entry content end -->
-		</main> 
-	</div> <!-- primary -->
-			</div> <!-- Row -->
-		</div> <!-- container -->
-	</div> <!-- content -->
-	
-</body>
+    <footer>
+    </footer>
+  </body>
 </html>
