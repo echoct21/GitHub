@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft Builds</title>
+    <style>
+        body { margin: 2em; font-family: sans-serif; }
+        h1 { color: DodgerBlue; }
+        h2 { color: DarkCyan; }
+        h3 { color: black; }
+    </style>
+</head>
+<body>
+    <p><a href="../index.html">Home Page</a></p>
+    <hr/>
+    <h1>Minecraft Art - Owen Lacey</h1>
+    <hr/>
+
+    These builds are things that I've done in Minecraft that were meant to be a piece of 3D art. All pictures here are taken with shaders applied for better lighting and shadows.
+	
+	<p><b>Minecraft Portfolio:</b></p>
+	<a href="MinecraftPortfolio.pdf">Link to PDF</a>
+	
+	<p>A windmill and farmlands, built as part of a scene styled after Toussaint, from the Witcher 3.</p>
+	<img src="Windmills.png" height = "500px" alt="">
+   
+	<p>A modified AT-AT from Star Wars, built standing in a swamp.</p>
+	<img src="AT_AT.png" height="500px" alt="">
+	
+	Shader Used: BSL Shaders
+
+</body>
+</html>
