@@ -2,26 +2,99 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>IMGD-3400: Owen Lacey</title>
+    <title>IMGD-3100: Owen Lacey</title>
     <style>
         body { margin: 2em; font-family: sans-serif; }
         h1 { color: DodgerBlue; }
         h2 { color: DarkCyan; }
         h3 { color: black; }
+		
+		.gallery {
+    		display: grid;
+   		 	grid-template-columns: repeat(8, 1fr);
+    		grid-template-rows: repeat(8, 5vw);
+    		grid-gap: 15px;
+		}
+		
+		.gallery__img {
+    		width: 100%;
+   			height: 100%;
+    		object-fit: cover;
+		}
+		
+		.gallery__item--1 {
+  			grid-column-start: 1;
+  			grid-column-end: 5;
+  			grid-row-start: 1;
+  			grid-row-end: 5;
+		}
+		.gallery__item--2 {
+  			grid-column-start: 5;
+  			grid-column-end: 10;
+  			grid-row-start: 1;
+  			grid-row-end: 5;
+		}
+		.gallery__item--3 {
+  			grid-column-start: 1;
+  			grid-column-end: 5;
+  			grid-row-start: 5;
+  			grid-row-end: 10;
+		}
+		.gallery__item--4 {
+  			grid-column-start: 5;
+  			grid-column-end: 10;
+  			grid-row-start: 5;
+  			grid-row-end: 10;
+		}
+		.gallery__item--5 {
+  			grid-column-start: 1;
+  			grid-column-end: 5;
+  			grid-row-start: 10;
+  			grid-row-end: 15;
+		}
+		.gallery__item--6 {
+  			grid-column-start: 5;
+  			grid-column-end: 10;
+  			grid-row-start: 10;
+  			grid-row-end: 15;
+		}
     </style>
 </head>
 <body>
     <p><a href="../index.html">Home Page</a></p>
     <hr/>
-    <h1>IMGD-3400: Owen Lacey</h1>
+    <h1>IMGD-3100: Owen Lacey</h1>
     
     <hr/>
 
     
-    <h3>Project - Jigsaw Story</h3>
-    <p><a href="jigsawStory.html">Description and Game</a></p>
+    <h3>Project - The Photographer's Clue</h3>
+    <h3>Instructions</h3>
 
-	For the final project, a game treatment, I drew the map of the region we designed. The four major regions are the Dunes, Canyons, Town of A'Sereth, and the Nerothi Plains.
-	<img src="IMDG_C_Map_V3.jpg" width = "500px" alt="">
+	To play this game, all you need is a camera. A DSLR will allow for the best results, but it can be played with a small digital camera, a phone camera, or even a film camera. To play, you must select a pattern from the options below, then use your camera to take a photo that has the same composition of values, and colors where relevant. There is no objective “victory” in this game, each player or group of players must judge for themselves what counts as a match.
+	
+	Click on one of the images below to be taken to a page where you can upload your own image for comparison. Images uploaded in this way are not stored, and only exist here until you close the page.
+	<p></p>
+	<div class="gallery">
+		<figure class="gallery__item gallery__item--1">
+    		<img src="TPC_BancroftArch.jpg" class="gallery__img" alt="A view through the arch of Bancroft Tower">
+  		</figure>
+  		<figure class="gallery__item gallery__item--2">
+    		<img src="TPC_Branch.jpg" class="gallery__img" alt="A snowy branch">
+  		</figure>
+		<figure class="gallery__item gallery__item--3">
+    		<img src="TPC_BancroftTower.jpg" class="gallery__img" alt="Bancroft Tower">
+  		</figure>
+		<figure class="gallery__item gallery__item--4">
+    		<img src="TPC_Column.JPG" class="gallery__img" alt="A column near Higgins House">
+  		</figure>
+  		<figure class="gallery__item gallery__item--5">
+    		<img src="TPC_Goat.JPG" class="gallery__img" alt="Gompei">
+  		</figure>
+		<figure class="gallery__item gallery__item--6">
+    		<img src="TPC_Lake.jpg" class="gallery__img" alt="The pond in Elm Park">
+  		</figure>
+	</div>
+	
 </body>
 </html>
