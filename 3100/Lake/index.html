@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IMGD-3100: Owen Lacey</title>
+    <style>
+        body { margin: 2em; font-family: sans-serif; }
+        h1 { color: DodgerBlue; }
+        h2 { color: DarkCyan; }
+        h3 { color: black; }
+		
+		.gallery {
+    		display: grid;
+   		 	grid-template-columns: repeat(8, 1fr);
+    		grid-template-rows: repeat(8, 5vw);
+    		grid-gap: 15px;
+		}
+		
+		.gallery__img {
+    		width: 100%;
+   			height: 100%;
+    		object-fit: cover;
+		}
+		
+		.gallery__item--1 {
+  			grid-column-start: 1;
+  			grid-column-end: 6;
+  			grid-row-start: 1;
+  			grid-row-end: 7;
+		}
+		#dropzone {
+  		border: 2px solid black;
+  		width: 500px;
+  		height: 300px;
+		}
+    </style>
+	
+	<script>
+	
+	// dropzone event handlers
+var dropzone;
+dropzone = document.getElementById("dropzone");
+dropzone.addEventListener("dragenter", dragenter, false);
+dropzone.addEventListener("dragover", dragover, false);
+dropzone.addEventListener("drop", drop, false);
+
+//
+function dragenter(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  //
+
+function dragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+//
+function drop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  var dt = e.dataTransfer;
+  var files = dt.files;
+
+  handleFiles(files);
+}
+
+//
+function handleFiles(files) {
+
+    for (var i = 0; i < files.length; i++) {
+
+      // get the next file that the user selected
+      var file = files[i];
+      var imageType = /image.*/;
+
+      // don't try to process non-images
+      if (!file.type.match(imageType)) {
+        continue;
+      }
+
+      // a seed img element for the FileReader
+      var img = document.createElement("img");
+      img.classList.add("obj");
+      img.file = file;
+
+      // get an image file from the user
+      // this uses drag/drop, but you could substitute file-browsing
+      var reader = new FileReader();
+      reader.onload = (function(aImg) {
+        return function(e) {
+          aImg.onload = function() {
+
+              // draw the aImg onto the canvas
+              var canvas = document.createElement("canvas");
+              var ctx = canvas.getContext("2d");
+              canvas.width = aImg.width;
+              canvas.height = aImg.height;
+              ctx.drawImage(aImg, 0, 0);
+
+              // make the jpeg image
+              var newImg = new Image();
+              newImg.onload = function() {
+                newImg.id = "newest";
+                document.body.appendChild(newImg);
+              }
+              newImg.src = canvas.toDataURL('image/jpeg');
+            }
+            // e.target.result is a dataURL for the image
+          aImg.src = e.target.result;
+        };
+      })(img);
+      reader.readAsDataURL(file);
+
+    } // end for
+
+  } // end handleFiles
+	
+	
+	
+	</script>
+</head>
+<body>
+    <p><a href="../index.html">Home Page</a></p>
+    <hr/>
+    <h1>IMGD-3100: Owen Lacey</h1>
+    
+    <hr/>
+
+    
+    <h3>Bancroft Tower - Original Image/Upload Image</h3>
+   
+	<p></p>
+	<div class="gallery">
+		<figure class="gallery__item gallery__item--1">
+    		<img src="TPC_Lake.jpg" class="gallery__img" alt="Bancroft Tower">
+  		</figure>
+  		
+	</div>
+	<h4>Drag file(s) from desktop to dropzone.<br>Only image files will be processed.</h4>
+	<div id="dropzone"></div>
+	<div id="preview"></div>
+	
+</body>
+</html>
