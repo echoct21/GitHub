@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+ <meta charset="UTF-8">
+    <title>IMGD-5300: Puzzle Design 1</title>
+    <style>
+        body { margin: 2em; font-family: sans-serif; }
+        h1 { color: DodgerBlue; }
+        h2 { color: DarkCyan; }
+        h3 { color: black; }
+    </style>
+</head>
+
+<body>
+	
+	<hr/>
+	 <h1>IMGD-5300: Owen Lacey</h1>
+	<hr/>
+	
+<p>John Everett - The Victoria’s captain <br>
+Liv Shotwell - Communications Operative from Iota Base<br>
+Jesse - Smuggler </p>
+
+	<h3>General Story:</h3>
+<p>This is a puzzle for IMGD 5300. It takes the form of a short Twine game </p>
+	
+	
+	<h2>Game Link: </h2> <a href="CrashAtIotaStation.html">Crash at Iota Station</a>
+	
+</body>
+</html>
