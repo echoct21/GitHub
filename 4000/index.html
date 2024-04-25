@@ -16,21 +16,47 @@
     <h1>IMGD-4000: Owen Lacey</h1>
     
     <hr/>
-
+    <div style="margin-left: 75px; margin-right: 75px">
     
-    <h2>Team Jigsaw - Intertwined</h2>
-    <br>
-    <h3>My Role:</h3>
-    <p>I was on the tech team worked on implementing the teleport and reset features. I designed a pin dropping mechanic that
-        allows the player to leave checkpoints to teleport back to. It stores a list of Pin actors in the player class, then
-        when the player presses the teleport button (left mouse click), gets the most recently placed pin, and moves the player to
-        its location, removing the pin in the process. The player is given a maximum of three pins to place, and can use any
-        number of them at a time.</p>
-    <p>I also designed the game reset mechanic, which is necessary for the puzzles in the game. It is possible to softlock
-        yourself out without it. Following a tutorial, I made a system that saves the player location, box locations, and door
-        rotations at the start of the game, and when the player reaches a checkpoint. They can then press 'R' to reset back
-        to the last checkpoint.</p>
-
-
+        <h2>Team Jigsaw - Intertwined</h2>
+        <h3>My Role:</h3>
+        <p>I was on the tech team worked on implementing the teleport and reset features. I designed a pin dropping mechanic that
+            allows the player to leave checkpoints to teleport back to. It stores a list of Pin actors in the player class, then
+            when the player presses the teleport button (left mouse click), gets the most recently placed pin, and moves the player to
+            its location, removing the pin in the process. The player is given a maximum of three pins to place, and can use any
+            number of them at a time.</p>
+        <p>I also designed the game reset mechanic, which is necessary for the puzzles in the game. It is possible to softlock
+            yourself out without it. Following a tutorial, I made a system that saves the player location, box locations, and door
+            rotations at the start of the game, and when the player reaches a checkpoint. They can then press 'R' to reset back
+            to the last checkpoint.</p>
+        <p>The initial concept for the game was also my idea: A puzzle game similar to Monument Valley. We didn't get a chance to
+            implement the isometric camera we wanted, but the overall effect still came out good.</p>
+        <br>
+        <h3>Challenges</h3>
+        <p>I had never used Unreal Engine, or any modern game engine, before the class so I had to learn how to use the engine
+            along with coding the game features. I had also never used blueprints to make full game features. I also had to deal
+            with unreal crashing or breaking multiple times on my computer. We also ran into issues with merging the branches
+            on GitHub. The player blueprint frequently got data overridden, causing us to lose work and have to re-create
+            functionality.</p>
+        <br>
+        <h3>Solutions</h3>
+        <p>Most of my problems were solvable by either re-installing Unreal (which I had to do a few times this term), or
+            finding solutions to my bugs or technical challenges online. The rest of the team was also helpful for figuring out
+            Unreal or GitHub problems when they came up.</p>
+        <br>
+        <h3>Architectural Diagram</h3>
+        <p>asdf</p>
+        <br>
+        <h3>Lessons Learned</h3>
+        <p>asdf</p>
+        <br>
+        <h3>Version Control</h3>
+        <p>We decided to try to use GitHub for version control, without trying to use any extra software to handle Unreal
+            files. Overall, it worked, but wasn't ideal. We needed a lot more communication than we had to keep people
+            from working on the same files and creating conflicts that lost work. Any of the blueprint files would override
+            changes rather than merge them, so if two people both worked on a file, one of them would have to re-make their
+            changes during a meeting.</p>
+        <br>
+    </div>
 </body>
 </html>
