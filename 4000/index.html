@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IMGD-3400: Owen Lacey</title>
+    <style>
+        body { margin: 2em; font-family: sans-serif; }
+        h1 { color: DodgerBlue; }
+        h2 { color: DarkCyan; }
+        h3 { color: black; }
+    </style>
+</head>
+<body>
+    <p><a href="../index.html">Home Page</a></p>
+    <hr/>
+    <h1>IMGD-4000: Owen Lacey</h1>
+    
+    <hr/>
+
+    
+    <h2>Team Jigsaw - Intertwined</h2>
+    <br>
+    <h3>My Role:</h3>
+    <p>I was on the tech team worked on implementing the teleport and reset features. I designed a pin dropping mechanic that
+        allows the player to leave checkpoints to teleport back to. It stores a list of Pin actors in the player class, then
+        when the player presses the teleport button (left mouse click), gets the most recently placed pin, and moves the player to
+        its location, removing the pin in the process. The player is given a maximum of three pins to place, and can use any
+        number of them at a time.</p>
+    <p>I also designed the game reset mechanic, which is necessary for the puzzles in the game. It is possible to softlock
+        yourself out without it. Following a tutorial, I made a system that saves the player location, box locations, and door
+        rotations at the start of the game, and when the player reaches a checkpoint. They can then press 'R' to reset back
+        to the last checkpoint.</p>
+
+
+</body>
+</html>
