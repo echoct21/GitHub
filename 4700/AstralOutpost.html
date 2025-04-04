@@ -23,6 +23,11 @@ The hub is a large dome. Glass panels in the roof reveal a green sky with a ring
 The four cardinal doors leading out of this room are closed. Some appear broken, but perhaps you could get one of them open.
 ] (else:)[\
 The doors have all become powered, and can be opened easily.]
+{
+(if: $Reactor is true)[The central glass case has opened, allowing access to the crystal inside. If you take the crystal out, the portals around this room will start to collapse.
+(link: &quot;Take the crystal&quot;)[You take the crystal. As you do, the portals around the room start to flicker and a few blink out instantly. You quickly gather the last of your things, and escape the outpost towards your next destination. [[Onto a new adventure-&gt;End]]]
+
+(link: &quot;Leave the crystal&quot;)[There&#39;s not much else to do here. You need that crystal.]]
 ---------------------------------------------------------------
 [[Open the North Door-&gt;Admin]]
 
@@ -112,12 +117,13 @@ The storage bays are empty, but there is a notice on the airlock door nearby.
 (link: &quot;Read the notice&quot;)[Attention: Once the fuel runs out you will need to collect more from the cave systems nearby. Stay alert for the cave vines, they can bite through an EVA suit.]
 {
 (if: $Fuel is true)[The fuel slots in the reactor are empty. It looks like you could place the cylinders in there easily.
-(link: &quot;Place the cylinders in the reactor&quot;)[You slide the cylinders in. As you do, the outpost lights glow brighter, and panels that seemed to be just part of the wall light up with glowing displays. The outpost is fully functional.]]}
+(link: &quot;Place the cylinders in the reactor&quot;)[You slide the cylinders in. As you do, the outpost lights glow brighter, and panels that seemed to be just part of the wall light up with glowing displays. The outpost is fully functional.\
+(set: $Reactor to true)]]}
 ---------------------------------------------------------------
 [[Return to the junction-&gt;East Junction]] 
 
 [[Go into the caves-&gt;CaveMine]]</tw-passagedata><tw-passagedata pid="9" name="Outside" tags="" position="1000,200" size="100,100">(align:&quot;=&gt;&lt;=&quot;)+(box:&quot;X=&quot;)[&#39;&#39;The Outpost Exterior&#39;&#39;]
-
+{(if: $EvaSuit is false)[(go-to: &quot;Death&quot;)]}
 The exterior of the outpost is a stark difference from the interior. Where the inside is clean metal and strange mechanical contraptions, the outside looks like familiar stone, steel, and glass. Alien vines weave across the structure and it looks to possibly be centuries old.
 
 There&#39;s a solar array somewhere out here, but you don&#39;t know where...
@@ -136,7 +142,7 @@ The solar array lies covered in dirt and vines. Clearly no one has tried to use 
 {
 (if: $Tool is &quot;Shears&quot;)[(link: &quot;Cut away the vines&quot;)[You cut away the vines from the solar panels. As you clear them off you see small indicators change from red to green. After you get about half of them you see the lights on the outpost exterior turn on, indicating that power has been restored.
 (set: $Solar to true)
-]
+]]
 
 (if: $Tool is not &quot;Shears&quot;)[You don&#39;t seem to have the tools to clear this off right now. Maybe there&#39;s something in the lab?]
 }
@@ -181,7 +187,7 @@ You search the outpost&#39;s perimeter, but don&#39;t find anything. Discouraged
 (set: $EvaSuit to false)
 (set: $Solar to false)
 (set: $Fuel to false)
-
+(set: $Reactor to false)
 
 
 }</tw-passagedata><tw-passagedata pid="16" name="Footer" tags="footer" position="200,600" size="100,100">-----------------------------------------------------------------------------------------
@@ -198,7 +204,7 @@ The caves are dark, with only a few lights placed on support beams. There seems 
 (rerun: ?Escape)\
 ]]
 ---------------------------------------------------------------
-[(if: $Fuel is true)[[[Exit the cave-&gt;Reactor]]]]&lt;Escape|</tw-passagedata></tw-storydata>
+[(if: $Fuel is true)[[[Exit the cave-&gt;Reactor]]]]&lt;Escape|</tw-passagedata><tw-passagedata pid="18" name="End" tags="" position="1300,1000" size="100,100"></tw-passagedata></tw-storydata>
 <script title="Twine engine code" data-main="harlowe">(function(){"use strict";
 var require,define;!function(){var e={},r={};require=function(i){var n=e[i];return n&&(r[i]=n[1].apply(void 0,n[0].map(require)),e[i]=void 0),r[i]},(define=function(r,i,n){if("function"==typeof r)return r();e[r]=[i,n]}).amd=!0}();/*!
  * https://github.com/paulmillr/es6-shim
