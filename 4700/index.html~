@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+ <meta charset="UTF-8">
+    <title>IMGD-5300: Puzzle Design 1</title>
+    <style>
+        body { margin: 2em; font-family: sans-serif; }
+        h1 { color: DodgerBlue; }
+        h2 { color: DarkCyan; }
+        h3 { color: black; }
+    </style>
+</head>
+
+<body>
+	
+	<hr/>
+	 <h1>IMGD-5300: Owen Lacey</h1>
+	<hr/>
+
+	<h3>General Story:</h3>
+<p>This is a puzzle for IMGD 5300. It takes the form of a short Twine game where you must investigate a shrine to an old knightly order in order to recover an artifact.</p>
+	
+	
+	<h2>Game Link: </h2> <a href="TheFiveKnights.html">The Five Knights</a>
+	
+</body>
+</html>
