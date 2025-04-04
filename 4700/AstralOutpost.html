@@ -23,7 +23,7 @@ The hub is a large dome. Glass panels in the roof reveal a green sky with a ring
 The four cardinal doors leading out of this room are closed. Some appear broken, but perhaps you could get one of them open.
 ] (else:)[\
 The doors have all become powered, and can be opened easily.]
-{
+
 (if: $Reactor is true)[The central glass case has opened, allowing access to the crystal inside. If you take the crystal out, the portals around this room will start to collapse.
 (link: &quot;Take the crystal&quot;)[You take the crystal. As you do, the portals around the room start to flicker and a few blink out instantly. You quickly gather the last of your things, and escape the outpost towards your next destination. [[Onto a new adventure-&gt;End]]]
 
@@ -46,7 +46,7 @@ The administration room is dark and cold. None of the switches work, and the cen
 
 It looks like perhaps if you restored power this room controls the rest of the outpost. There&#39;s a reactor in the eastern wing, and a solar array outside. Both seem inoperable.
 
-(if: $Solar is true)[&lt;img src=&quot;../Images/ALLIGATOR.jpg&quot; alt=&quot;Map of the Outpost&quot; style=&quot;horizontal-align:middle&quot; width=&quot;700&quot; height=&quot;auto&quot;&gt;]
+(if: $Solar is true)[&lt;img src=&quot;../images/AstralOutpost.jpg&quot; alt=&quot;Map of the Outpost&quot; style=&quot;horizontal-align:middle&quot; width=&quot;700&quot; height=&quot;auto&quot;&gt;]
 ---------------------------------------------------------------
 [[Return to the Hub-&gt;The Hub]] </tw-passagedata><tw-passagedata pid="4" name="Bio Research" tags="" position="700,600" size="100,100">(align:&quot;=&gt;&lt;=&quot;)+(box:&quot;X=&quot;)[&#39;&#39;Exo-Biological Research&#39;&#39;]
 
@@ -193,7 +193,7 @@ You search the outpost&#39;s perimeter, but don&#39;t find anything. Discouraged
 }</tw-passagedata><tw-passagedata pid="16" name="Footer" tags="footer" position="200,600" size="100,100">-----------------------------------------------------------------------------------------
 [Held Tool: [$Tool]
 (if: $EvaSuit)[You are wearing the EVA Suit]
-(else:)[You are not wearing the EVA Suit]]&lt;Toolbar|}</tw-passagedata><tw-passagedata pid="17" name="CaveMine" tags="" position="1600,700" size="100,100">(align:&quot;=&gt;&lt;=&quot;)+(box:&quot;X=&quot;)[&#39;&#39;The Caves&#39;&#39;]
+(else:)[You are not wearing the EVA Suit]]&lt;Toolbar|</tw-passagedata><tw-passagedata pid="17" name="CaveMine" tags="" position="1600,700" size="100,100">(align:&quot;=&gt;&lt;=&quot;)+(box:&quot;X=&quot;)[&#39;&#39;The Caves&#39;&#39;]
 
 The caves are dark, with only a few lights placed on support beams. There seems to be very little in here, though the vines mentioned on the warning creep in the dark corners of the cave.
 
@@ -204,7 +204,7 @@ The caves are dark, with only a few lights placed on support beams. There seems 
 (rerun: ?Escape)\
 ]]
 ---------------------------------------------------------------
-[(if: $Fuel is true)[[[Exit the cave-&gt;Reactor]]]]&lt;Escape|</tw-passagedata><tw-passagedata pid="18" name="End" tags="" position="1300,1000" size="100,100"></tw-passagedata></tw-storydata>
+[(if: $Fuel is true)[[[Exit the cave-&gt;Reactor]]]]&lt;Escape|</tw-passagedata><tw-passagedata pid="18" name="End" tags="" position="1300,1000" size="100,100">You escape the outpost with the crystal. The portal closes behind you, but there&#39;s surely a way back eventually. The real question is whether anyone would ever want to go there...</tw-passagedata></tw-storydata>
 <script title="Twine engine code" data-main="harlowe">(function(){"use strict";
 var require,define;!function(){var e={},r={};require=function(i){var n=e[i];return n&&(r[i]=n[1].apply(void 0,n[0].map(require)),e[i]=void 0),r[i]},(define=function(r,i,n){if("function"==typeof r)return r();e[r]=[i,n]}).amd=!0}();/*!
  * https://github.com/paulmillr/es6-shim
